@@ -2,7 +2,9 @@
 using MyPortfolio.Domain.Experiences.Entities;
 using MyPortfolio.Domain.Projects.Entities;
 using MyPortfolio.Domain.Skills.Entities;
+using MyPortfolio.Domain.Users.ValueObjects;
 using MyPortfolio.SharedKernel.Domain;
+using System.Net.Mail;
 
 namespace MyPortfolio.Domain.Users.Entities;
 
@@ -16,31 +18,34 @@ public sealed class User : BaseEntity
 
     private User() { }
     public User(
-        Guid id, 
-        string firstName, 
-        string lastName,
-        string email, 
-        string phoneNumber,
-        string headLine, 
-        string about, 
-        string? photo) : base(id)
+        Guid id,
+        FirstName firstName,
+        LastName lastName,
+        Age age,
+        EmailAddress email,
+        HeadLine headLine,
+        About about,
+        Photo? photo,
+        PasswordHash passwordHash) : base(id)
     {
         FirstName = firstName;
         LastName = lastName;
+        Age = age;
         Email = email;
-        PhoneNumber = phoneNumber;
         HeadLine = headLine;
         About = about;
         Photo = photo;
+        PasswordHash = passwordHash;
     }
 
-    public string FirstName { get; private set; } = null!;
-    public string LastName { get; private set; } = null!;
-    public string Email { get; private set; } = null!;
-    public string? PhoneNumber { get; private set; }
-    public string HeadLine { get; private set; } = null!;
-    public string About { get; private set; } = null!;
-    public string? Photo { get; private set; }
+    public FirstName FirstName { get; private set; } = null!;
+    public LastName LastName { get; private set; } = null!;
+    public Age Age { get; private set; } = null!;
+    public EmailAddress Email { get; private set; } = null!;
+    public HeadLine HeadLine { get; private set; } = null!;
+    public About About { get; private set; } = null!;
+    public Photo? Photo { get; private set; }
+    public PasswordHash PasswordHash { get; private set; } = null!;
     public DateTime? UpdatedAt { get; private set; }
 
     public Role Role { get; private set; }
