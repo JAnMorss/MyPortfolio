@@ -1,4 +1,5 @@
-﻿using MyPortfolio.Domain.Users.Entities;
+﻿using MyPortfolio.Domain.Educations.ValueObjects;
+using MyPortfolio.Domain.Users.Entities;
 using MyPortfolio.SharedKernel.Domain;
 
 namespace MyPortfolio.Domain.Educations.Entities;
@@ -9,11 +10,11 @@ public sealed class Education : BaseEntity
 
     public Education(
         Guid id,
-        string school,
-        string degree,
+        School school,
+        Degree degree,
         DateTime startDate,
         DateTime endDate,
-        string? description,
+        Description? description,
         Guid userId) : base(id)
     {
         School = school;
@@ -24,11 +25,11 @@ public sealed class Education : BaseEntity
         UserId = userId;
     }
 
-    public string School { get; private set; } = null!;
-    public string Degree { get; private set; } = null!;
+    public School School { get; private set; } = null!;
+    public Degree Degree { get; private set; } = null!;
     public DateTime? StartDate { get; private set; }
     public DateTime? EndDate { get; private set; }
-    public string? Description { get; private set; }
+    public Description? Description { get; private set; }
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
