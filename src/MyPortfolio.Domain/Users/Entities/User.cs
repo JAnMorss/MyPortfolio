@@ -1,4 +1,5 @@
-﻿using MyPortfolio.Domain.Educations.Entities;
+﻿using MyPortfolio.Domain.Common.ValueObjects;
+using MyPortfolio.Domain.Educations.Entities;
 using MyPortfolio.Domain.Experiences.Entities;
 using MyPortfolio.Domain.Projects.Entities;
 using MyPortfolio.Domain.Skills.Entities;
@@ -48,7 +49,9 @@ public sealed class User : BaseEntity
     public PasswordHash PasswordHash { get; private set; } = null!;
     public DateTime? UpdatedAt { get; private set; }
 
-    public Role Role { get; private set; }
+    public Guid RoleId { get; private set; }
+    public Role Role { get; private set; } = null!;
+
     public IReadOnlyCollection<RefreshToken> RefreshTokens 
         => _refreshTokens.AsReadOnly();
     public IReadOnlyCollection<Education> Educations
