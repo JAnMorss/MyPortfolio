@@ -1,4 +1,5 @@
-﻿using MyPortfolio.Domain.Educations.ValueObjects;
+﻿using MyPortfolio.Domain.Common.ValueObjects;
+using MyPortfolio.Domain.Educations.ValueObjects;
 using MyPortfolio.Domain.Users.Entities;
 using MyPortfolio.SharedKernel.Domain;
 
