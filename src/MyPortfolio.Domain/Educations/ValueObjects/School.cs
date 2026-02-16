@@ -13,7 +13,7 @@ public sealed class School :ValueObject
         Value = value;
     }
 
-    public static Result<School> Update(string school)
+    public static Result<School> Create(string school)
     {
         if (string.IsNullOrWhiteSpace(school))
         {

@@ -13,7 +13,7 @@ public sealed class Degree : ValueObject
         Value = value;
     }
 
-    public static Result<Degree> Update(string degree)
+    public static Result<Degree> Create(string degree)
     {
         if (string.IsNullOrWhiteSpace(degree))
         {
