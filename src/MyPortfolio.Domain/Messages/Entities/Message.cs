@@ -1,4 +1,7 @@
-﻿using MyPortfolio.SharedKernel.Domain;
+﻿using MyPortfolio.Domain.Common.ValueObjects;
+using MyPortfolio.Domain.Messages.ValueObjects;
+using MyPortfolio.SharedKernel.Domain;
+using System.Reflection.Metadata;
 
 namespace MyPortfolio.Domain.Messages.Entities;
 
@@ -11,12 +14,12 @@ public sealed class Message : BaseEntity
     }
 
     public Message(
-        string name,
-        string? email,
-        string? phoneNumber, 
-        string content)
+        PersonName personName,
+        EmailAddress? email,
+        PhoneNumber? phoneNumber,
+        Content content)
     {
-        Name = name;
+        PersonName = personName;
         Email = email;
         PhoneNumber = phoneNumber;
         Content = content;
@@ -24,9 +27,9 @@ public sealed class Message : BaseEntity
         SentAt = DateTime.UtcNow;
     }
 
-    public string Name { get; private set; } = null!;
-    public string? Email { get; private set; }
-    public string? PhoneNumber { get; private set; }
-    public string Content { get; private set; } = null!;
+    public PersonName PersonName { get; private set; } = null!;
+    public EmailAddress? Email { get; private set; }
+    public PhoneNumber? PhoneNumber { get; private set; }
+    public Content Content { get; private set; } = null!;
     public DateTime SentAt { get; private set; } 
 }
