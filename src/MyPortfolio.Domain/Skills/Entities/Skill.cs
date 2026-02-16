@@ -1,4 +1,5 @@
 ﻿using MyPortfolio.Domain.Skills.Enums;
+using MyPortfolio.Domain.Skills.ValueObjects;
 using MyPortfolio.Domain.Users.Entities;
 using MyPortfolio.SharedKernel.Domain;
 
@@ -9,17 +10,17 @@ public sealed class Skill : BaseEntity
     private Skill() { }
 
     public Skill(
-        Guid id, 
-        string name,
+        Guid id,
+        SkillName skillName,
         Level? level, 
         Guid userId) : base(id)
     {
-        Name = name;
+        SkillName = skillName;
         Level = level;
         UserId = userId;
     }
 
-    public string Name { get; private set; } = null!;
+    public SkillName SkillName { get; private set; } = null!;
     public Level? Level { get; private set; }
 
     public Guid UserId { get; private set; }
