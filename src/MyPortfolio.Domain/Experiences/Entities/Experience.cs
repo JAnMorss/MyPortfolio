@@ -1,4 +1,6 @@
-﻿using MyPortfolio.Domain.Users.Entities;
+﻿using MyPortfolio.Domain.Common.ValueObjects;
+using MyPortfolio.Domain.Experiences.ValueObjects;
+using MyPortfolio.Domain.Users.Entities;
 using MyPortfolio.SharedKernel.Domain;
 
 namespace MyPortfolio.Domain.Experiences.Entities;
@@ -9,10 +11,10 @@ public sealed class Experience : BaseEntity
 
     public Experience(
         Guid id,
-        string companyName,
+        CompanyName companyName,
         DateTime? startDate, 
-        DateTime? endDate, 
-        string? description,
+        DateTime? endDate,
+        Description? description,
         Guid userId) : base(id)
     {
         CompanyName = companyName;
@@ -22,10 +24,10 @@ public sealed class Experience : BaseEntity
         UserId = userId;
     }
 
-    public string CompanyName { get; private set; } = null!;
+    public CompanyName CompanyName { get; private set; } = null!;
     public DateTime? StartDate { get; private set; }
     public DateTime? EndDate { get; private set; }
-    public string? Description { get; private set; }
+    public Description? Description { get; private set; }
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
