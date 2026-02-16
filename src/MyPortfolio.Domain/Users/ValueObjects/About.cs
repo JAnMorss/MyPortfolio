@@ -13,7 +13,7 @@ public sealed class About : ValueObject
         Value = value;
     }
 
-    public static Result<About> Update(string about)
+    public static Result<About> Create(string about)
     {
         if (string.IsNullOrWhiteSpace(about))
         {
@@ -38,6 +38,4 @@ public sealed class About : ValueObject
         yield return Value;
     }
 
-    public override string ToString()
-        => Value.ToString();
 }

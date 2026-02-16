@@ -6,14 +6,14 @@ namespace MyPortfolio.Domain.Users.ValueObjects;
 public sealed class FirstName : ValueObject
 {
     public string Value { get; }
-    public const int MaxLength = 100;
+    public const int MaxLength = 50;
 
     public FirstName(string value)
     {
         Value = value;
     }
 
-    public static Result<FirstName> Update(string firstName)
+    public static Result<FirstName> Create(string firstName)
     {
         if (string.IsNullOrWhiteSpace(firstName))
         {
@@ -38,6 +38,4 @@ public sealed class FirstName : ValueObject
         yield return Value;
     }
 
-    public override string ToString()
-        => Value.ToString();
 }

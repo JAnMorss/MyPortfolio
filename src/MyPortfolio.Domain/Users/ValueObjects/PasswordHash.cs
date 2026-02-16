@@ -48,7 +48,7 @@ public sealed class PasswordHash : ValueObject
         return storedHash == hashed;
     }
 
-    public static Result<PasswordHash> Update(string hash)
+    public static Result<PasswordHash> Create(string hash)
     {
         if (string.IsNullOrWhiteSpace(hash))
         {

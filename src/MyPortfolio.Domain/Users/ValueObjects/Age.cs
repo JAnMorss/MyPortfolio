@@ -15,7 +15,7 @@ public sealed class Age : ValueObject
         Value = value;
     }
 
-    public static Result<Age> Update(int age)
+    public static Result<Age> Create(int age)
     {
         if (age < MinAge)
         {

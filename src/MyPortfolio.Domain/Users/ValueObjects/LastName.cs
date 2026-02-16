@@ -13,7 +13,7 @@ public sealed class LastName : ValueObject
         Value = value;
     }
 
-    public static Result<LastName> Update(string lastname)
+    public static Result<LastName> Create(string lastname)
     {
         if (string.IsNullOrWhiteSpace(lastname))
         {
@@ -37,6 +37,4 @@ public sealed class LastName : ValueObject
         yield return Value;
     }
 
-    public override string ToString()
-        => Value.ToString();
 }

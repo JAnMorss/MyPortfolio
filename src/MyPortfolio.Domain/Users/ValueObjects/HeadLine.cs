@@ -6,14 +6,14 @@ namespace MyPortfolio.Domain.Users.ValueObjects;
 public sealed class HeadLine : ValueObject
 {
     public string Value { get; }
-    public const int MaxLength = 100;
+    public const int MaxLength = 200;
 
     public HeadLine(string value)
     {
         Value = value;
     }
 
-    public static Result<HeadLine> Update(string headLine)
+    public static Result<HeadLine> Create(string headLine)
     {
         if (string.IsNullOrWhiteSpace(headLine))
         {
@@ -38,6 +38,4 @@ public sealed class HeadLine : ValueObject
         yield return Value;
     }
 
-    public override string ToString()
-        => Value.ToString();
 }
