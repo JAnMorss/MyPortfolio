@@ -1,20 +1,43 @@
+using MyPortfolio.API.Extensions;
+using MyPortfolio.Application;
+using MyPortfolio.Infrastructure;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig.ReadFrom.Configuration(context.Configuration);
+});
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
+
+app.UseSerilogRequestLogging();
+
+app.UseRequestContextLogging();
+
+app.UseCustomExceptionHandler();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
