@@ -75,12 +75,9 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
                 .IsRequired();
         });
 
-        builder.HasOne(u => u.Role)
+        builder.HasMany(u => u.Roles)
            .WithMany(r => r.Users)
-           .HasForeignKey(u => u.RoleId)
-           .IsRequired()
-           .OnDelete(DeleteBehavior.Restrict);
-
+           .UsingEntity(j => j.ToTable("UserRoles"));
 
         builder.HasMany(u => u.Educations)
             .WithOne(e => e.User)
