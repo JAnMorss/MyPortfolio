@@ -19,10 +19,9 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.HasMany(r => r.Users)
-               .WithOne(u => u.Role)
-               .HasForeignKey(u => u.RoleId)
-               .OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(role => role.Users)
+            .WithMany(role => role.Roles)
+            .UsingEntity(r => r.ToTable("UserRoles"));
 
         builder.HasData(
             new Role(Role.Admin.Id, Role.Admin.Name)
