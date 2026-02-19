@@ -6,7 +6,7 @@ public class Result
 
     public bool IsSuccess { get; }
 
-    public bool IsFailure { get; }
+    public bool IsFailure => !IsSuccess;
 
     protected internal Result(bool isSuccess, Error error)
     {
@@ -17,7 +17,7 @@ public class Result
 
         if (!isSuccess && error == Error.None)
         {
-            throw new InvalidOperationException("A failed result ,ust have an error");
+            throw new InvalidOperationException("A failed result must have an error");
         }
 
         IsSuccess = isSuccess;
@@ -45,7 +45,8 @@ public class Result
 public class Result<TValue> : Result
 {
     private readonly TValue? _value;
-    protected internal Result(TValue? value, bool isSuccess, Error error) 
+
+    protected internal Result(TValue? value, bool isSuccess, Error error)
         : base(isSuccess, error) => _value = value;
 
     public TValue Value => IsSuccess
@@ -54,4 +55,3 @@ public class Result<TValue> : Result
 
     public static implicit operator Result<TValue>(TValue? value) => Create(value);
 }
-
