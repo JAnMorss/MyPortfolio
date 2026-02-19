@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MyPortfolio.Application.Abstractions;
 using MyPortfolio.Domain.Educations.Entities;
 using MyPortfolio.Domain.Experiences.Entities;
 using MyPortfolio.Domain.Messages.Entities;
@@ -7,7 +8,6 @@ using MyPortfolio.Domain.Projects.Entities;
 using MyPortfolio.Domain.Skills.Entities;
 using MyPortfolio.Domain.Testimonials.Entities;
 using MyPortfolio.Domain.Users.Entities;
-using MyPortfolio.SharedKernel;
 using MyPortfolio.SharedKernel.Domain;
 
 namespace MyPortfolio.Infrastructure;
