@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MyPortfolio.SharedKernel;
+using MyPortfolio.Application.Abstractions;
+using MyPortfolio.Infrastructure.Authentication;
+using MyPortfolio.Infrastructure.Authentication.Extensions;
 
 namespace MyPortfolio.Infrastructure;
 
@@ -12,6 +14,8 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         AddPersistence(services, configuration);
+
+        AddAuthentication(services, configuration);
 
         return services;
     }
@@ -27,5 +31,16 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
+    }
+
+    private static void AddAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+
+        services.AddJwtAuthentication(configuration);
+
+        services.AddScoped<IJwtProvider, JwtProvider>();
     }
 }
