@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Asp.Versioning;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MyPortfolio.API.Abstractions;
 using MyPortfolio.API.Controllers.Auth.Requests;
@@ -7,8 +8,9 @@ using MyPortfolio.Application.Auth.Response;
 
 namespace MyPortfolio.API.Controllers.Auth;
 
-[Route("api/auth")]
 [ApiController]
+[ApiVersion(ApiVersions.V1)]
+[Route("api/v{version:apiVersion}/auth")]
 public class AuthController : ApiController
 {
     public AuthController(ISender sender)
@@ -36,3 +38,4 @@ public class AuthController : ApiController
             : HandleFailure(result);
     }
 }
+
