@@ -12,7 +12,7 @@ public class RequestContextLoggingMiddleware
         _next = next;
     }
 
-    public Task InVoke(HttpContext httpContext)
+    public Task Invoke(HttpContext httpContext)
     {
         using (LogContext.PushProperty("CorrelationId", GetCorrelationId(httpContext)))
         {
