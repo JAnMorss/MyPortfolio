@@ -8,9 +8,7 @@ public class ExceptionHandlingMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-    public ExceptionHandlingMiddleware(
-        RequestDelegate next,
-        ILogger<ExceptionHandlingMiddleware> logger)
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
         _logger = logger;
@@ -38,7 +36,6 @@ public class ExceptionHandlingMiddleware
                 _logger.LogError(ex, "Exception occured: {Message}", ex.Message);
             }
 
-
             var exceptionDetails = GetExceptionDetails(ex);
 
             var problemDetails = new ProblemDetails
@@ -46,17 +43,18 @@ public class ExceptionHandlingMiddleware
                 Status = exceptionDetails.Status,
                 Type = exceptionDetails.Type,
                 Title = exceptionDetails.Title,
-                Detail = exceptionDetails.Detail,
+                Detail = exceptionDetails.Detail
             };
 
-            if(exceptionDetails.Errors is not null)
+            if (exceptionDetails.Errors is not null)
             {
                 problemDetails.Extensions["errors"] = exceptionDetails.Errors;
             }
 
+            context.Response.StatusCode = exceptionDetails.Status;
+
             await context.Response.WriteAsJsonAsync(problemDetails);
         }
-
     }
 
     private static ExceptionDetails GetExceptionDetails(Exception ex)
@@ -64,19 +62,19 @@ public class ExceptionHandlingMiddleware
         return ex switch
         {
             ValidationException validationException => new ExceptionDetails(
-                StatusCodes.Status400BadRequest,
-                "ValidationFailure",
-                "Validation Error",
-                "One or more validation errors occurred.",
-                validationException.Errors
-            ),
+                    StatusCodes.Status400BadRequest,
+                    "ValidationFailure",
+                    "Validation Error",
+                    "One or more validation errors has occured",
+                    validationException.Errors
+                ),
             _ => new ExceptionDetails(
-                StatusCodes.Status500InternalServerError,
-                "ServerError",
-                "Internal Server Error",
-                "An unexpected error occurred. Please try again later.",
-                null
-            )
+                    StatusCodes.Status500InternalServerError,
+                    "ServerError",
+                    "Server Error",
+                    "An unexpected error has occured",
+                    null
+                )
         };
     }
 
