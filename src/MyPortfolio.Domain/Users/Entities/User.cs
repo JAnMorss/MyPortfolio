@@ -89,8 +89,6 @@ public sealed class User : BaseEntity
             photo,
             passwordHash);
 
-        user._roles.Add(Role.Admin);
-
         user.RaiseDomainEvent(new UserCreateDomainEvent(user.Id));
 
         return Result.Success(user);
@@ -178,4 +176,8 @@ public sealed class User : BaseEntity
 
     public void AddRefreshToken(RefreshToken refreshToken)
         => _refreshTokens.Add(refreshToken);
+
+    public void ClearRoles() => _roles.Clear();
+
+    public void AssignRole(Role role) => _roles.Add(role);
 }
