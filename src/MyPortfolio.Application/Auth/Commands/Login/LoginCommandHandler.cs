@@ -45,6 +45,11 @@ public sealed class LoginCommandHandler
         if(!user.PasswordHash!.Verify(request.Password))
             return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
 
+        if (!user.Roles.Any(r => r.Name == "Admin"))
+        {
+            return Result.Failure<AuthResponse>(UserErrors.OnlyAdmin);
+        }
+
         var token = _jwtProvider.Generate(user);
         var refreshToken = _jwtProvider.GenerateRefreshToken();
 
