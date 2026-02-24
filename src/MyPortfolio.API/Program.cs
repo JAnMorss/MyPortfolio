@@ -1,8 +1,10 @@
 using Asp.Versioning.ApiExplorer;
+using Microsoft.EntityFrameworkCore;
 using MyPortfolio.API.Extensions;
-using MyPortfolio.API.SwaggerConfig;
+using MyPortfolio.API.Swagger;
 using MyPortfolio.Application;
 using MyPortfolio.Infrastructure;
+using MyPortfolio.Infrastructure.Seeding;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,15 @@ builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 //builder.Services.AddSwaggerDocumentation();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    dbContext.Database.Migrate();
+
+    await AdminSeeder.SeedAsync(dbContext);
+}
 
 if (app.Environment.IsDevelopment())
 {
