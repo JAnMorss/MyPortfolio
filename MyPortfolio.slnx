@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/MyPortfolio.API/MyPortfolio.API.csproj" Id="9a638f9d-1dc3-49c5-af18-baf9fb7cdebd" />
+    <Project Path="src/MyPortfolio.API/MyPortfolio.API.csproj" Id="1c6d0a83-95f4-4eee-a202-b02dd415ea46" />
     <Project Path="src/MyPortfolio.Application/MyPortfolio.Application.csproj" Id="c463c2ad-187c-46b5-9e46-4001605402ff" />
     <Project Path="src/MyPortfolio.Domain/MyPortfolio.Domain.csproj" Id="6716e7cd-baff-4255-adf4-240a3f3fce24" />
     <Project Path="src/MyPortfolio.Infrastructure/MyPortfolio.Infrastructure.csproj" Id="05f77471-f265-4537-a374-edf261c53a9c" />
