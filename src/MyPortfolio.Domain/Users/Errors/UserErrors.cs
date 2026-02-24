@@ -53,5 +53,9 @@ public static class UserErrors
         "The user does not have the Admin role."
     );
 
+    public static readonly Error OnlyAdmin = new(
+        "User.OnlyAdmin",
+        "Only users with the Admin role can perform this action."
+    );
 
 }
