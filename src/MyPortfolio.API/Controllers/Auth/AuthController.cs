@@ -38,4 +38,3 @@ public class AuthController : ApiController
             : HandleFailure(result);
     }
 }
-
