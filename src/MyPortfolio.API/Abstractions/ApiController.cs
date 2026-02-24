@@ -8,9 +8,10 @@ namespace MyPortfolio.API.Abstractions;
 public abstract class ApiController : ControllerBase
 {
     protected readonly ISender _sender;
-
     protected ApiController(ISender sender)
-        => _sender = sender;
+    {
+        _sender = sender;
+    }
 
     protected IActionResult HandleFailure(Result result) =>
         result switch
@@ -30,18 +31,25 @@ public abstract class ApiController : ControllerBase
                         result.Error))
         };
 
+
     private static ProblemDetails CreateProblemDetails(
         string title,
         int status,
         Error error,
-        Error[]? errors = null) =>
-            new()
+        Error[]? errors = null)
+            => new()
             {
                 Title = title,
                 Type = error.Code,
                 Detail = error.Message,
                 Status = status,
-                Extensions = { { nameof(errors), errors } }
+                Extensions =
+                {
+                    {
+                        nameof(errors),
+                        errors
+                    }
+                }
             };
 
     protected Guid? GetUserId()
@@ -53,3 +61,4 @@ public abstract class ApiController : ControllerBase
             : Guid.Parse(userId);
     }
 }
+
