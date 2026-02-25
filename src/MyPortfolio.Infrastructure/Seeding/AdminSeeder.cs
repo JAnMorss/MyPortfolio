@@ -27,6 +27,8 @@ public static class AdminSeeder
         var headLine = HeadLine.Create("Administrator").Value;
         var about = About.Create("This is the default admin user.").Value;
         var passwordHash = PasswordHash.FromPlainText("P@ssw0rd!");
+        var photoResult = Photo.Create("https://i.pravatar.cc/150?img=1");
+        var photo = photoResult.Value;
 
         var adminUserResult = User.Create(
             firstName,
@@ -35,7 +37,7 @@ public static class AdminSeeder
             email,
             headLine,
             about,
-            null,
+            photo,
             passwordHash
         );
 
