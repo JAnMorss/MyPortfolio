@@ -37,13 +37,15 @@ internal sealed class UserRepository : Repository<User>, IUserRepository
     }
 
     public async Task<User?> GetByEmailAsync(
-    EmailAddress email,
-    CancellationToken cancellationToken = default)
+        EmailAddress email,
+        CancellationToken cancellationToken = default)
     {
-        var query = BuildQuery(_context, null); 
-
-        return await query
-            .FirstOrDefaultAsync(u => u.Email.Value == email.Value, cancellationToken);
+        return await _context.Users
+            .Include(u => u.Roles)
+            .Include(u => u.RefreshTokens)
+            .FirstOrDefaultAsync(
+                u => u.Email.Value == email.Value,
+                cancellationToken);
     }
 
 }
