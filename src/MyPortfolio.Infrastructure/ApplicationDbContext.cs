@@ -30,6 +30,7 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
     public DbSet<Project> Projects { get; set; }
     public DbSet<Skill> Skills { get; set; }
     public DbSet<Testimonial> Testimonials { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,6 +52,11 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
         await PublishDomainEventsAsync();
 
         return result;
+    }
+
+    public async Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken)
+    {
+        await RefreshTokens.AddAsync(refreshToken, cancellationToken);
     }
 
     public async Task PublishDomainEventsAsync()
