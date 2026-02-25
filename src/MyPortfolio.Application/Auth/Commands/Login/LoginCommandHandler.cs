@@ -59,7 +59,7 @@ public sealed class LoginCommandHandler
             DateTime.UtcNow.AddDays(7)
         );
 
-        user.AddRefreshToken(refreshTokenEntity);
+        await _unitOfWork.AddRefreshTokenAsync(refreshTokenEntity, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
