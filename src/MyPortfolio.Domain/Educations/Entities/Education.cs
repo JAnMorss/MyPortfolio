@@ -1,7 +1,9 @@
 ﻿using MyPortfolio.Domain.Common.ValueObjects;
+using MyPortfolio.Domain.Educations.Errors;
 using MyPortfolio.Domain.Educations.ValueObjects;
 using MyPortfolio.Domain.Users.Entities;
 using MyPortfolio.SharedKernel.Domain;
+using MyPortfolio.SharedKernel.ErrorHandling;
 
 namespace MyPortfolio.Domain.Educations.Entities;
 
@@ -13,17 +15,17 @@ public sealed class Education : BaseEntity
         Guid id,
         School school,
         Degree degree,
-        DateTime startDate,
-        DateTime endDate,
+        DateTime? startDate,
+        DateTime? endDate,
         Description? description,
         Guid userId) : base(id)
     {
         School = school;
         Degree = degree;
-        StartDate = startDate;
-        EndDate = endDate;
         Description = description;
         UserId = userId;
+
+        var result = SetDateRange(startDate, endDate);
     }
 
     public School School { get; private set; } = null!;
@@ -34,4 +36,18 @@ public sealed class Education : BaseEntity
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
+
+    public Result SetDateRange(DateTime? startDate, DateTime? endDate)
+    {
+        if (!startDate.HasValue)
+            return Result.Failure(EducationErrors.StartDateRequired);
+
+        if (endDate.HasValue && endDate.Value < startDate.Value)
+            return Result.Failure(EducationErrors.EndDateBeforeStartDate);
+
+        StartDate = startDate.Value;
+        EndDate = endDate;
+
+        return Result.Success();
+    }
 }
