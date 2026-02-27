@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyPortfolio.Application.Abstractions;
+using MyPortfolio.Domain.Educations.Interface;
 using MyPortfolio.Domain.Users.Interface;
 using MyPortfolio.Infrastructure.Authentication;
 using MyPortfolio.Infrastructure.Authentication.Extensions;
@@ -37,6 +38,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IEducationRepository, EducationRepository>();
     }
 
     private static void AddAuthentication(
