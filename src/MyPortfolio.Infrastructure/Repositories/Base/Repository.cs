@@ -28,8 +28,9 @@ internal abstract class Repository<T> : QueryHooks<T>, IRepository<T> where T : 
         CancellationToken cancellationToken = default)
     {
         return await _context
-            .Set<T>()
-            .CountAsync(cancellationToken);
+           .Set<T>()
+           .Where(e => EF.Property<Guid>(e, "UserId") == userId)
+           .CountAsync(cancellationToken);
     }
 
     public virtual async Task<bool> DeleteAsync(
@@ -47,8 +48,8 @@ internal abstract class Repository<T> : QueryHooks<T>, IRepository<T> where T : 
         return false;
     }
 
-    public virtual async Task<IEnumerable<T>> GetAllASync(
-        QueryObject queryObject, 
+    public virtual async Task<IEnumerable<T>> GetAllAsync(
+        QueryObject queryObject,
         CancellationToken cancellationToken = default)
     {
         var query = BuildQuery(_context, queryObject);
