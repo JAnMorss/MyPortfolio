@@ -19,6 +19,6 @@ public class QueryObject
     public int PageSize
     {
         get => _pageSize;
-        set => _pageSize = value > 0 ? value : 10;
+        set => _pageSize = (value > 0 && value <= 100) ? value : 10;
     }
 }
