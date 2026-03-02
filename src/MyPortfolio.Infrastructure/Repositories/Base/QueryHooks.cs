@@ -6,22 +6,23 @@ namespace MyPortfolio.Infrastructure.Repositories.Base;
 
 public abstract class QueryHooks<T> where T : BaseEntity
 {
-    public virtual IQueryable<T> BuildQuery(
+    protected virtual IQueryable<T> BuildQuery(
         ApplicationDbContext context,
-        QueryObject query)
+        QueryObject query,
+        Guid? userId = null)
     {
         return context.Set<T>().AsQueryable();
     }
 
-    public virtual IQueryable<T> ApplyFilters(
+    protected virtual IQueryable<T> ApplyFilters(
         IQueryable<T> query,
-        SearchQueryObject searchQuery,
+        QueryObject queryObject,
         Guid? userId = null)
     {
         return query;
     }
 
-    public virtual IQueryable<T> ApplySorting(
+    protected virtual IQueryable<T> ApplySorting(
         IQueryable<T> query,
         QueryObject queryObject)
     {
