@@ -39,6 +39,7 @@ public sealed class User : BaseEntity
         About = about;
         Photo = photo;
         PasswordHash = passwordHash;
+        UpdatedAt = null;
     }
 
     public FirstName FirstName { get; private set; } = null!;
@@ -94,49 +95,62 @@ public sealed class User : BaseEntity
         return Result.Success(user);
     }
 
-    public Result<User> UpdateDetails(
-        FirstName firstName,
-        LastName lastName,
-        Age age,
-        EmailAddress email,
-        HeadLine headLine,
-        About about)
+    public Result UpdateDetails(
+        string firstName,
+        string lastName,
+        int age,
+        string headLine,
+        string about)
     {
         bool changed = false;
 
-        if (!string.IsNullOrWhiteSpace(firstName.Value) && firstName != FirstName)
+        if (!string.IsNullOrWhiteSpace(firstName) && firstName != FirstName?.Value)
         {
-            FirstName = firstName;
+            var firstNameResult = FirstName.Create(firstName);
+            if (firstNameResult.IsFailure)
+                return Result.Failure(firstNameResult.Error);
+
+            FirstName = firstNameResult.Value;
             changed = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(lastName.Value) && lastName != LastName)
+        if (!string.IsNullOrWhiteSpace(lastName) && lastName != LastName?.Value)
         {
-            LastName = lastName;
+            var lastNameResult = LastName.Create(lastName);
+            if (lastNameResult.IsFailure)
+                return Result.Failure(lastNameResult.Error);
+
+            LastName = lastNameResult.Value;
             changed = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(age.ToString()) && age != Age)
+        if (!string.IsNullOrWhiteSpace(age.ToString()) && age != Age?.Value)
         {
-            Age = age;
+            var ageResult = Age.Create(age);
+            if (ageResult.IsFailure)
+                return Result.Failure(ageResult.Error);
+
+            Age = ageResult.Value;
             changed = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(email.Value) && email != Email)
+        if (!string.IsNullOrWhiteSpace(headLine) && headLine != HeadLine.Value)
         {
-            Email = email;
+            var headLineResult = HeadLine.Create(headLine);
+            if(headLineResult.IsFailure)
+                return Result.Failure(headLineResult.Error);
+
+            HeadLine = headLineResult.Value;
             changed = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(headLine.Value) && headLine != HeadLine)
+        if (!string.IsNullOrWhiteSpace(about) && about != About.Value)
         {
-            HeadLine = headLine;
-            changed = true;
-        }
+            var aboutResult = About.Create(about);
+            if(aboutResult.IsFailure)
+                return Result.Failure(aboutResult.Error);
 
-        if (!string.IsNullOrWhiteSpace(about.Value) && about != About)
-        {
-            About = about;
+            About = aboutResult.Value;
             changed = true;
         }
 
