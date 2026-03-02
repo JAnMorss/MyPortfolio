@@ -20,7 +20,8 @@ public sealed class Testimonial : BaseEntity
         Photo = photo;
         Status = TestimonialStatus.Pending;
 
-        SubmittedAt = DateTime.UtcNow; 
+        SubmittedAt = DateTime.UtcNow;
+        UpdatedAt = null;
     }
 
     public PersonName PersonName { get; private set; } = null!;
@@ -28,6 +29,7 @@ public sealed class Testimonial : BaseEntity
     public Photo? Photo { get; private set; }
     public TestimonialStatus Status { get; private set; }
     public DateTime SubmittedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     public void Approved()
         => Status = TestimonialStatus.Approved;
