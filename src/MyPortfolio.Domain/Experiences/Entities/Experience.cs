@@ -22,12 +22,16 @@ public sealed class Experience : BaseEntity
         EndDate = endDate;
         Description = description;
         UserId = userId;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = null;
     }
 
     public CompanyName CompanyName { get; private set; } = null!;
     public DateTime? StartDate { get; private set; }
     public DateTime? EndDate { get; private set; }
     public Description? Description { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
