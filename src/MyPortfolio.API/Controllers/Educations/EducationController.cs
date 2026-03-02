@@ -6,6 +6,8 @@ using MyPortfolio.API.Abstractions;
 using MyPortfolio.API.Controllers.Educations.Requests;
 using MyPortfolio.Application.Abstractions.PageSize;
 using MyPortfolio.Application.Educations.Commands.CreateEducation;
+using MyPortfolio.Application.Educations.Commands.DeleteEducation;
+using MyPortfolio.Application.Educations.Commands.UpdateEducation;
 using MyPortfolio.Application.Educations.Queries.GetAllEducations;
 using MyPortfolio.Application.Educations.Queries.GetEducationById;
 using MyPortfolio.Application.Educations.Responses;
@@ -85,6 +87,42 @@ public class EducationController : ApiController
             ? Ok(new ApiResponse<EducationResponse>(
                 result.Value,
                 "Education created successfully."))
+            : HandleFailure(result);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateEducation(
+        [FromRoute] Guid id,
+        [FromBody] EducationRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateEducationCommand(
+            id,
+            request.School,
+            request.Degree,
+            request.StartDate,
+            request.EndDate,
+            request.Description);
+
+        var result = await _sender.Send(command, cancellationToken);
+        return result.IsSuccess
+            ? Ok(new ApiResponse<EducationResponse>(
+                result.Value,
+                "Education updated successfully."))
+            : HandleFailure(result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteEducation(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteEducationCommand(id);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(new ApiResponse("Education deleted successfully."))
             : HandleFailure(result);
     }
 }
