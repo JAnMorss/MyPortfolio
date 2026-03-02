@@ -14,7 +14,10 @@ internal sealed class UserRepository : Repository<User>, IUserRepository
     {
     }
 
-    public override IQueryable<User> BuildQuery(ApplicationDbContext context, QueryObject query)
+    protected override IQueryable<User> BuildQuery(
+        ApplicationDbContext context,
+        QueryObject query,
+        Guid? userId = null)
     {
         var q = context.Users
             .Include(p => p.Roles)
