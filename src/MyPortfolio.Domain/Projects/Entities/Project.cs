@@ -24,6 +24,8 @@ public sealed class Project : BaseEntity
         Link = link;
         ImageUrl = imageUrl;
         UserId = userId;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = null;
     }
 
     public Title Title { get; private set; } = null!;
@@ -31,6 +33,8 @@ public sealed class Project : BaseEntity
     public Techstack Techstack { get; private set; } = null!;
     public Link? Link { get; private set; }
     public Photo? ImageUrl { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
