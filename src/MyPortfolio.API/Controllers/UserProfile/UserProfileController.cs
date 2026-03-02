@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyPortfolio.API.Abstractions;
+using MyPortfolio.API.Controllers.UserProfile.Requests;
+using MyPortfolio.Application.UserProfile.Commands.UpdateDetails;
 using MyPortfolio.Application.UserProfile.Queries.GetProfile;
 using MyPortfolio.Application.UserProfile.Responses;
 
@@ -18,14 +20,13 @@ public class UserProfileController : ApiController
     {
     }
 
-    [HttpGet("me")]
+    [HttpGet("details")]
     public async Task<IActionResult> GetUserProfile(CancellationToken cancellationToken)
     {
         var userId = GetUserId();
         if (userId is null)
-        {
             return Unauthorized();
-        }
+
         var query = new GetProfileQuery(userId.Value);
 
         var result = await _sender.Send(query, cancellationToken);
@@ -34,6 +35,33 @@ public class UserProfileController : ApiController
             ? Ok(new ApiResponse<UserResponse>(
                 result.Value, 
                 "User profile retrieved successfully"))
+            : HandleFailure(result);
+    }
+
+    [HttpPut("details")]
+    public async Task<IActionResult> UpdateUserProfile(
+        UserRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var command = new UpdateDetailsCommand(
+            userId.Value,
+            request.FirstName,
+            request.LastName,
+            request.Age,
+            request.HeadLine,
+            request.About
+        );
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(new ApiResponse<UserResponse>(
+                result.Value, 
+                "User profile updated successfully"))
             : HandleFailure(result);
     }
 }
