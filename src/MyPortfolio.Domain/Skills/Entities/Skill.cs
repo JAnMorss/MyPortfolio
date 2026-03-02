@@ -18,10 +18,14 @@ public sealed class Skill : BaseEntity
         SkillName = skillName;
         Level = level;
         UserId = userId;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = null;
     }
 
     public SkillName SkillName { get; private set; } = null!;
     public Level? Level { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
