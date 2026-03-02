@@ -13,7 +13,22 @@ internal sealed class EducationRepository
     {
     }
 
-    public override IQueryable<Education> ApplySorting(
+    protected override IQueryable<Education> BuildQuery(
+    ApplicationDbContext context,
+    QueryObject query,
+    Guid? userId = null)
+    {
+        var baseQuery = base.BuildQuery(context, query, userId);
+
+        if (userId.HasValue)
+        {
+            baseQuery = baseQuery.Where(e => e.UserId == userId.Value);
+        }
+
+        return baseQuery;
+    }
+
+    protected override IQueryable<Education> ApplySorting(
         IQueryable<Education> query,
         QueryObject queryObject)
     {
