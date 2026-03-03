@@ -82,7 +82,10 @@ public sealed class Education : BaseEntity
             isUpdated = true;
         }
 
-        var result = SetDateRange(startDate, endDate);
+        var dateRangeResult = SetDateRange(startDate, endDate);
+
+        if (dateRangeResult.IsFailure)
+            return Result.Failure(dateRangeResult.Error);
 
         if (isUpdated)
         {
