@@ -7,7 +7,8 @@ using MyPortfolio.SharedKernel.Helpers;
 
 namespace MyPortfolio.Infrastructure.Repositories;
 
-internal sealed class UserRepository : Repository<User>, IUserRepository
+internal sealed class UserRepository
+    : Repository<User>, IUserRepository
 {
     public UserRepository(ApplicationDbContext context) 
         : base(context)
