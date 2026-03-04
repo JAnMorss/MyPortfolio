@@ -2,6 +2,7 @@
 using MyPortfolio.Domain.Testimonials.Enums;
 using MyPortfolio.Domain.Testimonials.ValueObjects;
 using MyPortfolio.SharedKernel.Domain;
+using MyPortfolio.SharedKernel.ErrorHandling;
 
 namespace MyPortfolio.Domain.Testimonials.Entities;
 
@@ -30,6 +31,7 @@ public sealed class Testimonial : BaseEntity
     public TestimonialStatus Status { get; private set; }
     public DateTime SubmittedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
+
 
     public void Approved()
         => Status = TestimonialStatus.Approved;
