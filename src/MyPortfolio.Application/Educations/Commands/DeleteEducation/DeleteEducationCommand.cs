@@ -2,4 +2,4 @@
 
 namespace MyPortfolio.Application.Educations.Commands.DeleteEducation;
 
-public sealed record DeleteEducationCommand(Guid Id) : ICommand<Guid>;
+public sealed record DeleteEducationCommand(Guid Id) : ICommand;
