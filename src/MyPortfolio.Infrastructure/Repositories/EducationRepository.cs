@@ -14,9 +14,9 @@ internal sealed class EducationRepository
     }
 
     protected override IQueryable<Education> BuildQuery(
-    ApplicationDbContext context,
-    QueryObject query,
-    Guid? userId = null)
+        ApplicationDbContext context,
+        QueryObject query,
+        Guid? userId = null)
     {
         var baseQuery = base.BuildQuery(context, query, userId);
 
