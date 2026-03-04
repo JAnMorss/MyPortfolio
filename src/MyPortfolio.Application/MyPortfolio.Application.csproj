@@ -20,7 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Experiences\Commands\" />
+    <Folder Include="Skills\Commands\" />
+    <Folder Include="Skills\Queries\" />
   </ItemGroup>
 
 </Project>
