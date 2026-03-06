@@ -24,6 +24,6 @@ public sealed class GetEducationByIdQueryHandler : IQueryHandler<GetEducationByI
         if(education is null)
             return Result.Failure<EducationResponse>(EducationErrors.NotFound);
 
-        return EducationResponse.FromEntity(education);
+        return Result.Success(EducationResponse.FromEntity(education));
     }
 }
