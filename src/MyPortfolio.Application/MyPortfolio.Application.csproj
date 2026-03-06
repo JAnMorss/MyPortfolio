@@ -19,9 +19,4 @@
     <ProjectReference Include="..\SharedKernel\MyPortfolio.SharedKernel\MyPortfolio.SharedKernel.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Skills\Commands\" />
-    <Folder Include="Skills\Queries\" />
-  </ItemGroup>
-
 </Project>
