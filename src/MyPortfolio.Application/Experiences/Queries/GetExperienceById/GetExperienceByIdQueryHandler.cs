@@ -24,6 +24,6 @@ public sealed class GetExperienceByIdQueryHandler
         if(experience is null)
             return Result.Failure<ExperienceResponse>(ExperienceErrors.NotFound);
 
-        return ExperienceResponse.FromEntity(experience);
+        return Result.Success(ExperienceResponse.FromEntity(experience));
     }
 }
