@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MyPortfolio.Application.Abstractions;
 using MyPortfolio.Domain.Educations.Interface;
 using MyPortfolio.Domain.Experiences.Interface;
+using MyPortfolio.Domain.Projects.Interface;
 using MyPortfolio.Domain.Skills.Interface;
 using MyPortfolio.Domain.Users.Interface;
 using MyPortfolio.Infrastructure.Authentication;
@@ -43,6 +44,7 @@ public static class DependencyInjection
         services.AddScoped<IEducationRepository, EducationRepository>();
         services.AddScoped<IExperienceRepository, ExperienceRepository>();
         services.AddScoped<ISkillRepository, SkillRepository>();
+        services.AddScoped<IProjectRepository, ProjectRepository>();
     }
 
     private static void AddAuthentication(
