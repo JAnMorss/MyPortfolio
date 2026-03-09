@@ -139,26 +139,6 @@ namespace MyPortfolio.Infrastructure.Migrations
                     b.ToTable("Skills", (string)null);
                 });
 
-            modelBuilder.Entity("MyPortfolio.Domain.Testimonials.Entities.Testimonial", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Testimonials", (string)null);
-                });
-
             modelBuilder.Entity("MyPortfolio.Domain.Users.Entities.Permission", b =>
                 {
                     b.Property<int>("Id")
@@ -415,25 +395,6 @@ namespace MyPortfolio.Infrastructure.Migrations
 
             modelBuilder.Entity("MyPortfolio.Domain.Messages.Entities.Message", b =>
                 {
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.EmailAddress", "Email", b1 =>
-                        {
-                            b1.Property<Guid>("MessageId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)")
-                                .HasColumnName("Email");
-
-                            b1.HasKey("MessageId");
-
-                            b1.ToTable("Messages");
-
-                            b1.WithOwner()
-                                .HasForeignKey("MessageId");
-                        });
-
                     b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.PersonName", "PersonName", b1 =>
                         {
                             b1.Property<Guid>("MessageId")
@@ -444,6 +405,25 @@ namespace MyPortfolio.Infrastructure.Migrations
                                 .HasMaxLength(150)
                                 .HasColumnType("nvarchar(150)")
                                 .HasColumnName("PersonName");
+
+                            b1.HasKey("MessageId");
+
+                            b1.ToTable("Messages");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MessageId");
+                        });
+
+                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.EmailAddress", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("MessageId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("nvarchar(255)")
+                                .HasColumnName("Email");
 
                             b1.HasKey("MessageId");
 
@@ -651,73 +631,6 @@ namespace MyPortfolio.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MyPortfolio.Domain.Testimonials.Entities.Testimonial", b =>
-                {
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.PersonName", "PersonName", b1 =>
-                        {
-                            b1.Property<Guid>("TestimonialId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)")
-                                .HasColumnName("PersonName");
-
-                            b1.HasKey("TestimonialId");
-
-                            b1.ToTable("Testimonials");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TestimonialId");
-                        });
-
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Photo", "Photo", b1 =>
-                        {
-                            b1.Property<Guid>("TestimonialId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("Photo");
-
-                            b1.HasKey("TestimonialId");
-
-                            b1.ToTable("Testimonials");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TestimonialId");
-                        });
-
-                    b.OwnsOne("MyPortfolio.Domain.Testimonials.ValueObjects.Quote", "Quote", b1 =>
-                        {
-                            b1.Property<Guid>("TestimonialId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(1000)
-                                .HasColumnType("nvarchar(1000)")
-                                .HasColumnName("Quote");
-
-                            b1.HasKey("TestimonialId");
-
-                            b1.ToTable("Testimonials");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TestimonialId");
-                        });
-
-                    b.Navigation("PersonName")
-                        .IsRequired();
-
-                    b.Navigation("Photo");
-
-                    b.Navigation("Quote");
                 });
 
             modelBuilder.Entity("MyPortfolio.Domain.Users.Entities.RefreshToken", b =>
