@@ -1,5 +1,4 @@
 ﻿using MyPortfolio.Domain.Common.ValueObjects;
-using MyPortfolio.Domain.Experiences.ValueObjects;
 using MyPortfolio.Domain.Projects.Events;
 using MyPortfolio.Domain.Projects.ValueObjects;
 using MyPortfolio.Domain.Users.Entities;
