@@ -6,7 +6,6 @@ using MyPortfolio.Domain.Experiences.Entities;
 using MyPortfolio.Domain.Messages.Entities;
 using MyPortfolio.Domain.Projects.Entities;
 using MyPortfolio.Domain.Skills.Entities;
-using MyPortfolio.Domain.Testimonials.Entities;
 using MyPortfolio.Domain.Users.Entities;
 using MyPortfolio.SharedKernel.Domain;
 
@@ -29,7 +28,6 @@ public sealed class ApplicationDbContext : DbContext, IUnitOfWork
     public DbSet<Message> Messages { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Skill> Skills { get; set; }
-    public DbSet<Testimonial> Testimonials { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
