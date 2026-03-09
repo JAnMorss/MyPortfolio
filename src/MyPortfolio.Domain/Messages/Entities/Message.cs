@@ -1,7 +1,6 @@
 ﻿using MyPortfolio.Domain.Common.ValueObjects;
 using MyPortfolio.Domain.Messages.ValueObjects;
 using MyPortfolio.SharedKernel.Domain;
-using System.Reflection.Metadata;
 
 namespace MyPortfolio.Domain.Messages.Entities;
 
