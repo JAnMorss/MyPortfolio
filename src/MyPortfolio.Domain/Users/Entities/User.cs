@@ -3,6 +3,7 @@ using MyPortfolio.Domain.Educations.Entities;
 using MyPortfolio.Domain.Experiences.Entities;
 using MyPortfolio.Domain.Projects.Entities;
 using MyPortfolio.Domain.Skills.Entities;
+using MyPortfolio.Domain.Users.Errors;
 using MyPortfolio.Domain.Users.Events;
 using MyPortfolio.Domain.Users.ValueObjects;
 using MyPortfolio.SharedKernel.Domain;
@@ -174,7 +175,7 @@ public sealed class User : BaseEntity
         return Result.Success(this);
      } 
 
-    public Result UpdatePhoto(string photoUrl)
+    public Result UpdateAvatar(string photoUrl)
     {
         var photoResult = Photo.Create(photoUrl);
         if (photoResult.IsFailure)
