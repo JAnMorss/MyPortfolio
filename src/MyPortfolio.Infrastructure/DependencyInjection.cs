@@ -1,8 +1,10 @@
 ﻿using Asp.Versioning;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyPortfolio.Application.Abstractions;
+using MyPortfolio.Application.Abstractions.BlobStorage;
 using MyPortfolio.Domain.Educations.Interface;
 using MyPortfolio.Domain.Experiences.Interface;
 using MyPortfolio.Domain.Projects.Interface;
@@ -10,6 +12,7 @@ using MyPortfolio.Domain.Skills.Interface;
 using MyPortfolio.Domain.Users.Interface;
 using MyPortfolio.Infrastructure.Authentication;
 using MyPortfolio.Infrastructure.Authentication.Extensions;
+using MyPortfolio.Infrastructure.BlobStorage;
 using MyPortfolio.Infrastructure.Repositories;
 
 namespace MyPortfolio.Infrastructure;
@@ -36,7 +39,14 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("Database");
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                    errorNumbersToAdd: null
+                );
+            });
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
@@ -45,6 +55,9 @@ public static class DependencyInjection
         services.AddScoped<IExperienceRepository, ExperienceRepository>();
         services.AddScoped<ISkillRepository, SkillRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
+
+        services.AddSingleton(x => new BlobServiceClient(configuration.GetConnectionString("BlobStorage")));
+        services.AddScoped<IBlobService, BlobService>();
     }
 
     private static void AddAuthentication(
