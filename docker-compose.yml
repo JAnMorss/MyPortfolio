@@ -1,0 +1,67 @@
+﻿services:
+  portfolio.api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: janmors/portfolio:v1
+    container_name: portfolio.api
+    ports:
+      - "8026:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Database=Server=portfolio.db,1433;Database=MyPortfolio;User Id=sa;Password=Root1234;Trusted_Connection=False;TrustServerCertificate=true
+      - Seq__ServerUrl=http://portfolio-seq:5341
+    depends_on:
+      - portfolio.db
+      - portfolio-seq
+      - portfolio-blob-storage
+    networks:
+      - my_network
+
+  portfolio.db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: portfolio.db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Root1234
+      - MSSQL_PID=Developer
+    ports:
+      - "2026:1433"
+    networks:
+      - my_network
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+  portfolio-seq:
+    image: datalust/seq:latest
+    container_name: portfolio-seq
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+    ports:
+      - "5341:5341"
+      - "8082:80"
+    networks:
+      - my_network
+    volumes:
+      - seq-data:/data
+
+  portfolio-blob-storage:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    container_name: portfolio.blob-storage
+    ports:
+      - "10000:10000"
+    volumes:
+      - blob-storage-data:/data
+    command: "azurite-blob --blobHost 0.0.0.0 -l /data"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  mssql-data:
+  seq-data:
+  blob-storage-data:
