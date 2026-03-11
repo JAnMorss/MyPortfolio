@@ -8,6 +8,7 @@ using MyPortfolio.Application.Abstractions.PageSize;
 using MyPortfolio.Application.Projects.Commands.CreateProject;
 using MyPortfolio.Application.Projects.Commands.DeleteProject;
 using MyPortfolio.Application.Projects.Commands.UpdateProject;
+using MyPortfolio.Application.Projects.Commands.UploadProjectMedia;
 using MyPortfolio.Application.Projects.Queries.GetAllProjects;
 using MyPortfolio.Application.Projects.Queries.GetProjectById;
 using MyPortfolio.Application.Projects.Responses;
@@ -123,6 +124,21 @@ public class ProjectController : ApiController
 
         return result.IsSuccess
             ? Ok(new ApiResponse("Project deleted successfully."))
+            : HandleFailure(result);
+    }
+
+    [HttpPut("{id:guid}/media")]
+    public async Task<IActionResult> UploadProjectMedia(
+    [FromRoute] Guid id,
+    IFormFile file,
+    CancellationToken cancellationToken)
+    {
+        var command = new UploadProjectMediaCommand(id, file);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(new ApiResponse("Project media uploaded successfully."))
             : HandleFailure(result);
     }
 }
