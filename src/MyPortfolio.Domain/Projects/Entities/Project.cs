@@ -17,14 +17,14 @@ public sealed class Project : BaseEntity
         Description? description,
         Techstack techstack,
         Link? link,
-        Photo? imageUrl, 
+        Photo? mediaUrl, 
         Guid userId) : base(id)
     {
         Title = title;
         Description = description;
         Techstack = techstack;
         Link = link;
-        ImageUrl = imageUrl;
+        MediaUrl = mediaUrl;
         UserId = userId;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
@@ -34,7 +34,7 @@ public sealed class Project : BaseEntity
     public Description? Description { get; private set; }
     public Techstack Techstack { get; private set; } = null!;
     public Link? Link { get; private set; }
-    public Photo? ImageUrl { get; private set; }
+    public Photo? MediaUrl { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
@@ -97,4 +97,19 @@ public sealed class Project : BaseEntity
 
         return Result.Success(this);
     }
+
+    public Result UpdateMedia(string mediaUrl)
+    {
+        var photoResult = Photo.Create(mediaUrl);
+        if (photoResult.IsFailure)
+            return Result.Failure(photoResult.Error);
+
+        MediaUrl = photoResult.Value;
+        UpdatedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(new MediaUpdatedDomainEvent(Id));
+
+        return Result.Success();
+    }
+
 }
