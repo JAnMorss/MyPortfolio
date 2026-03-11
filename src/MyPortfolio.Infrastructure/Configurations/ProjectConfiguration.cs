@@ -42,10 +42,10 @@ internal sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
                 .HasMaxLength(2048);
         });
 
-        builder.OwnsOne(p => p.ImageUrl, i =>
+        builder.OwnsOne(p => p.MediaUrl, i =>
         {
             i.Property(p => p.Value)
-                .HasColumnName("ImageUrl")
+                .HasColumnName("MediaUrl")
                 .HasMaxLength(500);
         });
     }
