@@ -17,5 +17,7 @@ public interface IRepository<T> where T : BaseEntity
     
     Task<int> CountAsync(Guid userId, CancellationToken cancellationToken = default);
 
+    Task<int> CountAsync(CancellationToken cancellationToken = default);
+
     Task<IEnumerable<T>> SearchAsync(SearchQueryObject searchQuery, Guid? userId, CancellationToken cancellationToken = default);
 }
