@@ -13,6 +13,7 @@ public sealed class Message : BaseEntity
     }
 
     public Message(
+        Guid id,
         PersonName personName,
         EmailAddress? email,
         PhoneNumber? phoneNumber,
