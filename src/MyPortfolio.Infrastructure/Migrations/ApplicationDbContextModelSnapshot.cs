@@ -187,7 +187,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("MyPortfolio.Domain.Users.Entities.Role", b =>
@@ -271,25 +271,6 @@ namespace MyPortfolio.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Description", "Description", b1 =>
-                        {
-                            b1.Property<Guid>("EducationId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(1000)
-                                .HasColumnType("nvarchar(1000)")
-                                .HasColumnName("Description");
-
-                            b1.HasKey("EducationId");
-
-                            b1.ToTable("Educations");
-
-                            b1.WithOwner()
-                                .HasForeignKey("EducationId");
-                        });
-
                     b.OwnsOne("MyPortfolio.Domain.Educations.ValueObjects.Degree", "Degree", b1 =>
                         {
                             b1.Property<Guid>("EducationId")
@@ -303,7 +284,26 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("EducationId");
 
-                            b1.ToTable("Educations");
+                            b1.ToTable("Educations", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("EducationId");
+                        });
+
+                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Description", "Description", b1 =>
+                        {
+                            b1.Property<Guid>("EducationId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(1000)
+                                .HasColumnType("nvarchar(1000)")
+                                .HasColumnName("Description");
+
+                            b1.HasKey("EducationId");
+
+                            b1.ToTable("Educations", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("EducationId");
@@ -322,7 +322,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("EducationId");
 
-                            b1.ToTable("Educations");
+                            b1.ToTable("Educations", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("EducationId");
@@ -347,25 +347,6 @@ namespace MyPortfolio.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Description", "Description", b1 =>
-                        {
-                            b1.Property<Guid>("ExperienceId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(1000)
-                                .HasColumnType("nvarchar(1000)")
-                                .HasColumnName("Description");
-
-                            b1.HasKey("ExperienceId");
-
-                            b1.ToTable("Experiences");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ExperienceId");
-                        });
-
                     b.OwnsOne("MyPortfolio.Domain.Experiences.ValueObjects.CompanyName", "CompanyName", b1 =>
                         {
                             b1.Property<Guid>("ExperienceId")
@@ -379,7 +360,26 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("ExperienceId");
 
-                            b1.ToTable("Experiences");
+                            b1.ToTable("Experiences", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ExperienceId");
+                        });
+
+                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Description", "Description", b1 =>
+                        {
+                            b1.Property<Guid>("ExperienceId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(1000)
+                                .HasColumnType("nvarchar(1000)")
+                                .HasColumnName("Description");
+
+                            b1.HasKey("ExperienceId");
+
+                            b1.ToTable("Experiences", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ExperienceId");
@@ -395,20 +395,20 @@ namespace MyPortfolio.Infrastructure.Migrations
 
             modelBuilder.Entity("MyPortfolio.Domain.Messages.Entities.Message", b =>
                 {
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.PersonName", "PersonName", b1 =>
+                    b.OwnsOne("MyPortfolio.Domain.Messages.ValueObjects.Content", "Content", b1 =>
                         {
                             b1.Property<Guid>("MessageId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)")
-                                .HasColumnName("PersonName");
+                                .HasMaxLength(1000)
+                                .HasColumnType("nvarchar(1000)")
+                                .HasColumnName("Content");
 
                             b1.HasKey("MessageId");
 
-                            b1.ToTable("Messages");
+                            b1.ToTable("Messages", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("MessageId");
@@ -427,26 +427,26 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("MessageId");
 
-                            b1.ToTable("Messages");
+                            b1.ToTable("Messages", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("MessageId");
                         });
 
-                    b.OwnsOne("MyPortfolio.Domain.Messages.ValueObjects.Content", "Content", b1 =>
+                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.PersonName", "PersonName", b1 =>
                         {
                             b1.Property<Guid>("MessageId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasMaxLength(1000)
-                                .HasColumnType("nvarchar(1000)")
-                                .HasColumnName("Content");
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)")
+                                .HasColumnName("PersonName");
 
                             b1.HasKey("MessageId");
 
-                            b1.ToTable("Messages");
+                            b1.ToTable("Messages", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("MessageId");
@@ -465,7 +465,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("MessageId");
 
-                            b1.ToTable("Messages");
+                            b1.ToTable("Messages", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("MessageId");
@@ -503,26 +503,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("ProjectId");
 
-                            b1.ToTable("Projects");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProjectId");
-                        });
-
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Photo", "MediaUrl", b1 =>
-                        {
-                            b1.Property<Guid>("ProjectId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("MediaUrl");
-
-                            b1.HasKey("ProjectId");
-
-                            b1.ToTable("Projects");
+                            b1.ToTable("Projects", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ProjectId");
@@ -541,7 +522,26 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("ProjectId");
 
-                            b1.ToTable("Projects");
+                            b1.ToTable("Projects", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProjectId");
+                        });
+
+                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Photo", "MediaUrl", b1 =>
+                        {
+                            b1.Property<Guid>("ProjectId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("MediaUrl");
+
+                            b1.HasKey("ProjectId");
+
+                            b1.ToTable("Projects", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ProjectId");
@@ -560,7 +560,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("ProjectId");
 
-                            b1.ToTable("Projects");
+                            b1.ToTable("Projects", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ProjectId");
@@ -579,7 +579,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("ProjectId");
 
-                            b1.ToTable("Projects");
+                            b1.ToTable("Projects", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ProjectId");
@@ -621,7 +621,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("SkillId");
 
-                            b1.ToTable("Skills");
+                            b1.ToTable("Skills", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("SkillId");
@@ -661,47 +661,6 @@ namespace MyPortfolio.Infrastructure.Migrations
 
             modelBuilder.Entity("MyPortfolio.Domain.Users.Entities.User", b =>
                 {
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.EmailAddress", "Email", b1 =>
-                        {
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("nvarchar(255)")
-                                .HasColumnName("Email");
-
-                            b1.HasKey("UserId");
-
-                            b1.HasIndex("Value")
-                                .IsUnique();
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Photo", "Photo", b1 =>
-                        {
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("Photo");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.OwnsOne("MyPortfolio.Domain.Users.ValueObjects.About", "About", b1 =>
                         {
                             b1.Property<Guid>("UserId")
@@ -715,7 +674,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -732,7 +691,29 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.EmailAddress", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("nvarchar(255)")
+                                .HasColumnName("Email");
+
+                            b1.HasKey("UserId");
+
+                            b1.HasIndex("Value")
+                                .IsUnique();
+
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -751,7 +732,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -770,7 +751,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -789,7 +770,7 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -808,7 +789,26 @@ namespace MyPortfolio.Infrastructure.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.OwnsOne("MyPortfolio.Domain.Common.ValueObjects.Photo", "Photo", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("Photo");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
