@@ -33,6 +33,11 @@ internal abstract class Repository<T> : QueryHooks<T>, IRepository<T> where T : 
            .CountAsync(cancellationToken);
     }
 
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<T>().CountAsync(cancellationToken);
+    }
+
     public virtual async Task<bool> DeleteAsync(
         Guid id, 
         CancellationToken cancellationToken = default)
