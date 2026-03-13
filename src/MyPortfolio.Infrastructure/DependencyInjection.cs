@@ -7,6 +7,7 @@ using MyPortfolio.Application.Abstractions;
 using MyPortfolio.Application.Abstractions.BlobStorage;
 using MyPortfolio.Domain.Educations.Interface;
 using MyPortfolio.Domain.Experiences.Interface;
+using MyPortfolio.Domain.Messages.Interface;
 using MyPortfolio.Domain.Projects.Interface;
 using MyPortfolio.Domain.Skills.Interface;
 using MyPortfolio.Domain.Users.Interface;
@@ -55,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IExperienceRepository, ExperienceRepository>();
         services.AddScoped<ISkillRepository, SkillRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
 
         services.AddSingleton(x => new BlobServiceClient(configuration.GetConnectionString("BlobStorage")));
         services.AddScoped<IBlobService, BlobService>();
