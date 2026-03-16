@@ -49,11 +49,11 @@ if (app.Environment.IsDevelopment())
         options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
         options.CustomCss = "";
         options.AddPreferredSecuritySchemes("Bearer")
-        .AddHttpAuthentication("Bearer", auth =>
-        {
-            auth.Token = "jwt-token-placeholder";
-        }).EnablePersistentAuthentication();
-    });
+            .AddHttpAuthentication("Bearer", auth =>
+            {
+                auth.Token = "jwt-token-placeholder";
+            }).EnablePersistentAuthentication();
+        });
 
     app.ApplyMigrations();
 }

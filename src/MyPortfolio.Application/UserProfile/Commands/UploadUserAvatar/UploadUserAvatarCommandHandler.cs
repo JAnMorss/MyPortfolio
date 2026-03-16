@@ -38,15 +38,19 @@ public sealed class UploadUserAvatarCommandHandler
         {
             var existingFileId = Photo.ExtractFileIdFromUrl(user.Photo.Value);
             if (existingFileId.HasValue)
-                await _blobService.DeleteAsync(AvatarContainer, existingFileId.Value);
+                await _blobService.DeleteAsync(AvatarContainer, existingFileId.Value, cancellationToken);
         }
 
         using var stream = request.File.OpenReadStream();
 
+        var contentType = string.IsNullOrWhiteSpace(request.File.ContentType)
+            ? "application/octet-stream"
+            : request.File.ContentType;
+
         var newFileId = await _blobService.UploadAsync(
             AvatarContainer,
             stream,
-            request.File.ContentType,
+            contentType,
             cancellationToken
         );
 
