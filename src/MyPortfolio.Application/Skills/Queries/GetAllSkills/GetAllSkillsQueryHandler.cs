@@ -32,7 +32,7 @@ public sealed class GetAllSkillsQueryHandler
             .Select(SkillResponse.FromEntity)
             .ToList();
 
-        var totalCount = await _skillRepository.CountAsync(request.UserId, cancellationToken);
+        var totalCount = await _skillRepository.CountAsync(cancellationToken);
 
         var result = new PaginatedResult<SkillResponse>(
             mapped,
