@@ -31,7 +31,7 @@ public sealed class GetAllEducationsQueryHandler : IQueryHandler<GetAllEducation
             .Select(EducationResponse.FromEntity)
             .ToList();
 
-        var totalCount = await _educationRepository.CountAsync(request.UserId, cancellationToken);
+        var totalCount = await _educationRepository.CountAsync(cancellationToken);
 
         var result = new PaginatedResult<EducationResponse>(
             mapped,
