@@ -18,7 +18,7 @@ namespace MyPortfolio.API.Controllers.Messages;
 [ApiController]
 [ApiVersion(ApiVersions.V1)]
 [Route("api/v{version:apiVersion}/message")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class MessageController : ApiController
 {
     public MessageController(ISender sender) 
@@ -27,6 +27,7 @@ public class MessageController : ApiController
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllMessages(
         [FromQuery] QueryObject queryObject,
         CancellationToken cancellationToken)
@@ -43,6 +44,7 @@ public class MessageController : ApiController
     }
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetMessageById(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
