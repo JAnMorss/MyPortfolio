@@ -5,7 +5,4 @@ using MyPortfolio.SharedKernel.Mediators.Query;
 
 namespace MyPortfolio.Application.Projects.Queries.GetAllProjects;
 
-public sealed record GetAllProjectsQuery(
-    QueryObject? Query,
-    Guid UserId
-) : IQuery<PaginatedResult<ProjectResponse>>;
+public sealed record GetAllProjectsQuery(QueryObject? Query) : IQuery<PaginatedResult<ProjectResponse>>;
