@@ -18,7 +18,7 @@ namespace MyPortfolio.API.Controllers.Experiences;
 [ApiController]
 [ApiVersion(ApiVersions.V1)]
 [Route("api/v{version:apiVersion}/experience")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class ExperienceController : ApiController
 {
     public ExperienceController(ISender sender)
@@ -27,15 +27,13 @@ public class ExperienceController : ApiController
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllExperiences(
         [FromQuery] QueryObject queryObject,
         CancellationToken cancellationToken)
     {
-        var userId = GetUserId();
-        if(userId is null)
-            return Unauthorized();
 
-        var query = new GetAllExperiencesQuery(queryObject, userId.Value);
+        var query = new GetAllExperiencesQuery(queryObject);
 
         var result = await _sender.Send(query, cancellationToken);
 
@@ -47,6 +45,7 @@ public class ExperienceController : ApiController
     }
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetExperienceById(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
