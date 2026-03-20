@@ -20,7 +20,7 @@ namespace MyPortfolio.API.Controllers.Projects;
 [ApiController]
 [ApiVersion(ApiVersions.V1)]
 [Route("api/v{version:apiVersion}/project")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class ProjectController : ApiController
 {
     public ProjectController(ISender sender)
@@ -29,15 +29,13 @@ public class ProjectController : ApiController
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllProjects(
         [FromQuery] QueryObject queryObject,
         CancellationToken cancellationToken)
     {
-        var userId = GetUserId();
-        if (userId is null)
-            return Unauthorized();
 
-        var query = new GetAllProjectsQuery(queryObject, userId.Value);
+        var query = new GetAllProjectsQuery(queryObject);
 
         var result = await _sender.Send(query, cancellationToken);
 
@@ -49,6 +47,7 @@ public class ProjectController : ApiController
     }
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetProjectById(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
