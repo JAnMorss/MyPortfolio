@@ -5,7 +5,4 @@ using MyPortfolio.SharedKernel.Mediators.Query;
 
 namespace MyPortfolio.Application.Experiences.Queries.GetAllExperiences;
 
-public sealed record GetAllExperiencesQuery(
-    QueryObject? Query,
-    Guid UserId
-) : IQuery<PaginatedResult<ExperienceResponse>>;
+public sealed record GetAllExperiencesQuery(QueryObject? Query) : IQuery<PaginatedResult<ExperienceResponse>>;
