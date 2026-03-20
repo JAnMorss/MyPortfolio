@@ -28,6 +28,7 @@ internal sealed class UserRepository
         return q;
     }
 
+
     public override async Task AddAsync(
         User user,
         CancellationToken cancellationToken = default)
