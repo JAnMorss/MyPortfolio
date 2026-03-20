@@ -18,7 +18,7 @@ namespace MyPortfolio.API.Controllers.Skills;
 [ApiController]
 [ApiVersion(ApiVersions.V1)]
 [Route("api/v{version:apiVersion}/skill")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class SkillController : ApiController
 {
     public SkillController(ISender sender)
@@ -27,15 +27,12 @@ public class SkillController : ApiController
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllSkills(
         [FromQuery] QueryObject queryObject,
         CancellationToken cancellationToken)
     {
-        var userId = GetUserId();
-        if(userId is null)
-            return Unauthorized();
-
-        var query = new GetAllSkillsQuery(queryObject, userId.Value);
+        var query = new GetAllSkillsQuery(queryObject);
 
         var result = await _sender.Send(query, cancellationToken);
 
@@ -47,6 +44,7 @@ public class SkillController : ApiController
     }
 
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetSkillById(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
