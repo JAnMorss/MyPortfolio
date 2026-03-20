@@ -15,27 +15,26 @@ namespace MyPortfolio.API.Controllers.UserProfile;
 [ApiController]
 [ApiVersion(ApiVersions.V1)]
 [Route("api/v{version:apiVersion}/user-profile")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class UserProfileController : ApiController
 {
     public UserProfileController(ISender sender) : base(sender)
     {
     }
 
-    [HttpGet("details")]
-    public async Task<IActionResult> GetUserProfile(CancellationToken cancellationToken)
+    [AllowAnonymous]
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetUserProfile(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
     {
-        var userId = GetUserId();
-        if (userId is null)
-            return Unauthorized();
-
-        var query = new GetProfileQuery(userId.Value);
+        var query = new GetProfileQuery(id);
 
         var result = await _sender.Send(query, cancellationToken);
 
         return result.IsSuccess
             ? Ok(new ApiResponse<UserResponse>(
-                result.Value, 
+                result.Value,
                 "User profile retrieved successfully"))
             : HandleFailure(result);
     }
