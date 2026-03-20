@@ -32,7 +32,7 @@ public sealed class GetAllExperiencesQueryHandler
             .Select(ExperienceResponse.FromEntity)
             .ToList();
 
-        var totalCount = await _experienceRepository.CountAsync(request.UserId, cancellationToken);
+        var totalCount = await _experienceRepository.CountAsync(cancellationToken);
 
         var result = new PaginatedResult<ExperienceResponse>(
             mapped,
