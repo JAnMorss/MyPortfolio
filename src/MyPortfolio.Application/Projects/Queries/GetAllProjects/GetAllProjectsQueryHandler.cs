@@ -32,7 +32,7 @@ public sealed class GetAllProjectsQueryHandler
             .Select(ProjectResponse.FromEntity)
             .ToList();
 
-        var totalCount = await _projectRepository.CountAsync(request.UserId, cancellationToken);
+        var totalCount = await _projectRepository.CountAsync(cancellationToken);
 
         var result = new PaginatedResult<ProjectResponse>(
             mapped,
