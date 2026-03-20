@@ -5,7 +5,4 @@ using MyPortfolio.SharedKernel.Mediators.Query;
 
 namespace MyPortfolio.Application.Educations.Queries.GetAllEducations;
 
-public sealed record GetAllEducationsQuery(
-    QueryObject? Query,
-    Guid UserId
-) : IQuery<PaginatedResult<EducationResponse>>;
+public sealed record GetAllEducationsQuery(QueryObject? Query) : IQuery<PaginatedResult<EducationResponse>>;
