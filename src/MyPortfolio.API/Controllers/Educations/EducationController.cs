@@ -18,7 +18,7 @@ namespace MyPortfolio.API.Controllers.Educations;
 [ApiController]
 [ApiVersion(ApiVersions.V1)]
 [Route("api/v{version:apiVersion}/educations")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class EducationController : ApiController
 {
     public EducationController(ISender sender)
@@ -26,17 +26,14 @@ public class EducationController : ApiController
     {
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAllEducations(
         [FromQuery] QueryObject queryObject,
         CancellationToken cancellationToken
     )
     {
-        var userId = GetUserId();
-        if (userId is null)
-            return Unauthorized();
-
-        var query = new GetAllEducationsQuery(queryObject, userId.Value);
+        var query = new GetAllEducationsQuery(queryObject);
 
         var result = await _sender.Send(query, cancellationToken);
 
@@ -47,6 +44,7 @@ public class EducationController : ApiController
             : HandleFailure(result);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(
         [FromRoute] Guid id,
