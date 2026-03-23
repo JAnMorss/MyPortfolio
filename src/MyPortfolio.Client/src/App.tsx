@@ -2,7 +2,6 @@ import Header from './components/header/Header'
 import SidebarProfile from './components/sidebarProfile/sidebarProfile'
 
 function App() {
-
   return (
     <>
         <div className="min-h-screen bg-white text-black dark:bg-[#212830] dark:text-white">
