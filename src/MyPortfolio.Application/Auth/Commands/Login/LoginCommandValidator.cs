@@ -2,7 +2,8 @@
 
 namespace MyPortfolio.Application.Auth.Commands.Login;
 
-internal sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
+internal sealed class LoginCommandValidator 
+    : AbstractValidator<LoginCommand>
 {
     public LoginCommandValidator()
     {
