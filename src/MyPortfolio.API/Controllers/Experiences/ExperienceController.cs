@@ -87,7 +87,7 @@ public class ExperienceController : ApiController
             : HandleFailure(result);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateExperience(
         [FromRoute] Guid id,
         [FromBody] ExperienceRequest request,
