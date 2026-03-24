@@ -1,24 +1,51 @@
-import { userProfileSchema, type UserProfileResponse } from "@/schemas/users/userProfile.schema";
-import type { AxiosInstance, AxiosResponse } from "axios";
-import axios from "axios";
+import { UpdateUserProfileSchema, userProfileSchema, type UpdateUserProfileInput, type UserProfileData } from "@/schemas/users/userProfile.schema";
+import axios, {
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+  AxiosHeaders,
+  type AxiosResponse,
+} from "axios";
 
 
-const PUBLIC_BASE_URL = "http://localhost:8026/api/v1";
+const BASE_URL = "http://localhost:8026/api/v1";
 
-const publicApi: AxiosInstance = axios.create({
-  baseURL: PUBLIC_BASE_URL,
-  headers: { "Content-Type": "application/json" },
+const api: AxiosInstance = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-export const publicUserApiConnector = {
-  getUserProfileById: async (userId: string): Promise<UserProfileResponse> => {
-    try {
-      const response: AxiosResponse = await publicApi.get(`/user-profile/${userId}`);
-      const parsed = userProfileSchema.parse(response.data);
-      return parsed;
-    } catch (error) {
-      console.error("Failed to fetch user profile:", error);
-      throw error;
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      if (!config.headers) {
+        config.headers = new AxiosHeaders();
+      }
+      config.headers.set("Authorization", `Bearer ${token}`);
     }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error) => Promise.reject(error)
+);
+
+export const userApiConnector = {
+  getUserProfileById: async (userId: string): Promise<UserProfileData> => {
+    const response = await api.get(`/user-profile/${userId}`);
+    return userProfileSchema.parse(response.data).data;
+  },
+
+  updateUserProfile: async (
+    data: UpdateUserProfileInput
+  ): Promise<UserProfileData> => {
+    const validData = UpdateUserProfileSchema.parse(data);
+    const response = await api.patch("/user-profile/details", validData);
+    return userProfileSchema.parse(response.data).data;
   },
 };
