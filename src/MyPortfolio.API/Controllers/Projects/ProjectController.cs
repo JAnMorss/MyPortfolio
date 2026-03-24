@@ -89,7 +89,7 @@ public class ProjectController : ApiController
             : HandleFailure(result);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateProject(
         [FromRoute] Guid id,
         [FromBody] ProjectRequest request,
