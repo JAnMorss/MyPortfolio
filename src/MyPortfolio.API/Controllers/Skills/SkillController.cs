@@ -84,7 +84,7 @@ public class SkillController : ApiController
             : HandleFailure(result);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateSkill(
         [FromRoute] Guid id,
         [FromBody] SkillRequest request,
