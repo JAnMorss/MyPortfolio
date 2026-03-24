@@ -39,7 +39,7 @@ public class UserProfileController : ApiController
             : HandleFailure(result);
     }
 
-    [HttpPut("details")]
+    [HttpPatch("details")]
     public async Task<IActionResult> UpdateUserProfile(
         UserRequest request,
         CancellationToken cancellationToken)
