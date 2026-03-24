@@ -88,7 +88,7 @@ public class EducationController : ApiController
             : HandleFailure(result);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateEducation(
         [FromRoute] Guid id,
         [FromBody] EducationRequest request,
