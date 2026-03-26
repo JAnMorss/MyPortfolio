@@ -48,4 +48,18 @@ export const userApiConnector = {
     const response = await api.patch("/user-profile/details", validData);
     return userProfileSchema.parse(response.data).data;
   },
+
+  updateUserAvatar: async (file: File): Promise<UserProfileData> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.put("/user-profile/avatar", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return userProfileSchema.parse(response.data).data;
+  },
+
 };
