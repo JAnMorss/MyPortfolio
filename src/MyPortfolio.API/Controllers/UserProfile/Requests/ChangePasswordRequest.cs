@@ -1,0 +1,5 @@
+﻿namespace MyPortfolio.API.Controllers.UserProfile.Requests;
+
+public sealed record ChangePasswordRequest(
+    string OldPassword,
+    string NewPassword);
