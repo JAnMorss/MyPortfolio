@@ -165,15 +165,37 @@ public sealed class User : BaseEntity
 
         return Result.Success(this);
     }
-     public Result<User> UpdatePassword(PasswordHash newPasswordHash)
+     public Result UpdatePassword(PasswordHash newPasswordHash)
      {
+        if (newPasswordHash is null)
+            return Result.Failure(UserErrors.InvalidPassword);
+
+        if (PasswordHash == newPasswordHash)
+            return Result.Success(this);
+
         PasswordHash = newPasswordHash;
         UpdatedAt = DateTime.UtcNow;
 
-        RaiseDomainEvent(new UserUpdateDomainEvent(Id));
+        RaiseDomainEvent(new UserUpdatePasswordDomainEvent(Id));
 
         return Result.Success(this);
      } 
+
+    public Result UpdateEmail(EmailAddress newEmail)
+    {
+        if (newEmail is null)
+            return Result.Failure(UserErrors.InvalidEmail);
+
+        if (newEmail.Equals(Email))
+            return Result.Success(this);
+
+        Email = newEmail;
+        UpdatedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(new UserUpdateEmailDomainEvent(Id));
+
+        return Result.Success(this);
+    }
 
     public Result UpdateAvatar(string photoUrl)
     {
