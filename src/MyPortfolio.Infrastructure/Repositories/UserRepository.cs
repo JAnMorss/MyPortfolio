@@ -53,4 +53,11 @@ internal sealed class UserRepository
                 cancellationToken);
     }
 
+    public async Task<bool> ExistsByEmailAsync(
+        EmailAddress email, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .AnyAsync(u => u.Email.Value == email.Value, cancellationToken);
+    }
 }
