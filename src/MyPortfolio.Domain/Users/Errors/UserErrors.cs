@@ -58,4 +58,9 @@ public static class UserErrors
         "Only users with the Admin role can perform this action."
     );
 
+    public static readonly Error EmailAlreadyExists = new(
+        "Email.AlreadyExists",
+        "The Email is Already Exists, Use another email."
+    );
+
 }
