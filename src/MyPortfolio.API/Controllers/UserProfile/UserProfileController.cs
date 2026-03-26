@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyPortfolio.API.Abstractions;
 using MyPortfolio.API.Controllers.UserProfile.Requests;
+using MyPortfolio.Application.UserProfile.Commands.ChangeEmail;
+using MyPortfolio.Application.UserProfile.Commands.ChangePassword;
 using MyPortfolio.Application.UserProfile.Commands.UpdateDetails;
 using MyPortfolio.Application.UserProfile.Commands.UploadUserAvatar;
 using MyPortfolio.Application.UserProfile.Queries.GetProfile;
@@ -99,6 +101,49 @@ public class UserProfileController : ApiController
 
         return result.IsSuccess
             ? Ok(new ApiResponse("User avatar updated successfully"))
+            : HandleFailure(result);
+    }
+
+    [HttpPatch("change-password")]
+    public async Task<IActionResult> ChangePassword(
+        ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var command = new ChangePasswordCommand(
+            userId.Value,
+            request.OldPassword,
+            request.NewPassword
+        );
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(new ApiResponse("Password changed successfully"))
+            : HandleFailure(result);
+    }
+
+    [HttpPatch("change-email")]
+    public async Task<IActionResult> ChangeEmail(
+        ChangeEmailRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var command = new ChangeEmailCommand(
+            userId.Value,
+            request.NewEmail
+        );
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(new ApiResponse("Email updated successfully"))
             : HandleFailure(result);
     }
 }
