@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Github, Linkedin, Mail, Users } from "lucide-react";
+import { Github, Linkedin, Mail, Users, Pencil } from "lucide-react";
 import type {
   UserProfileData,
   UpdateUserProfileInput,
@@ -92,6 +92,9 @@ export default function SidebarProfile() {
   });
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
+  // Ref for hidden file input
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleChange = (field: keyof LocalEditData, value: string | number) => {
     setLocalData((prev) => ({ ...prev, [field]: value }));
   };
@@ -117,6 +120,54 @@ export default function SidebarProfile() {
     onError: (err: Error) => console.error("Failed to update:", err.message),
   });
 
+  // Mutation for avatar upload
+  const { mutate: updateAvatar, isPending: isUploading } = useMutation({
+    mutationFn: (file: File) => userApiConnector.updateUserAvatar(file),
+    onSuccess: (updatedData) => {
+      queryClient.setQueryData(["userProfile", USER_ID], updatedData);
+    },
+    onError: (err: Error) => console.error("Avatar upload failed:", err.message),
+  });
+
+  const handleEditClick = () => {
+    if (!isAuthenticated) {
+      setIsLoginOpen(true);
+      return;
+    }
+
+    if (!data) return;
+
+    const { fullName, age, headLine, about } = data;
+    const { firstName: firstNameFromApi, lastName: lastNameFromApi } = splitName(fullName);
+
+    setLocalData({
+      firstName: firstNameFromApi,
+      lastName: lastNameFromApi,
+      age,
+      headLine,
+      about: about || "",
+    });
+    setIsEditMode(true);
+  };
+
+  const handleSave = () => mutate(localData);
+  const handleCancel = () => setIsEditMode(false);
+
+  const handleAvatarClick = () => {
+    if (!isAuthenticated) {
+      setIsLoginOpen(true);
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      updateAvatar(file);
+    }
+  };
+
   if (isLoading)
     return (
       <div className="p-4 space-y-2 animate-pulse">
@@ -134,37 +185,40 @@ export default function SidebarProfile() {
       </div>
     );
 
-  const { fullName, email, photo, about, age, headLine } = data;
+  const { fullName, email, photo, about, } = data;
   const { firstName: firstNameFromApi, lastName: lastNameFromApi } = splitName(fullName);
-
-  const handleEditClick = () => {
-    if (!isAuthenticated) {
-      setIsLoginOpen(true);
-      return;
-    }
-
-    setLocalData({
-      firstName: firstNameFromApi,
-      lastName: lastNameFromApi,
-      age,
-      headLine,
-      about: about || "",
-    });
-    setIsEditMode(true);
-  };
-
-  const handleSave = () => mutate(localData);
-  const handleCancel = () => setIsEditMode(false);
 
   return (
     <div className="space-y-4">
       <LoginModal open={isLoginOpen} onOpenChange={setIsLoginOpen} />
 
-      <div className="flex justify-center lg:justify-start">
+      <div className="relative w-[260px] h-[260px] mx-auto lg:mx-0">
         <img
           src={photo || "https://i.pravatar.cc/260"}
           alt="Profile"
-          className="w-[260px] h-[260px] rounded-full border border-gray-300 dark:border-gray-600"
+          className="w-full h-full rounded-full border border-gray-300 dark:border-gray-600 object-cover"
+        />
+
+        {isEditMode && (
+          <button
+            onClick={handleAvatarClick}
+            className="absolute bottom-2 right-2 flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            disabled={isUploading}
+            aria-label="Edit profile picture"
+            type="button"
+          >
+            <Pencil className="w-4 h-4" />
+            {isUploading ? "Uploading..." : "Edit"}
+          </button>
+        )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+          disabled={isUploading}
         />
       </div>
 
