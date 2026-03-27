@@ -1,4 +1,4 @@
-import { UpdateUserProfileSchema, userProfileSchema, type UpdateUserProfileInput, type UserProfileData } from "@/schemas/users/userProfile.schema";
+import { UpdateUserProfileSchema, UserAvatarSchema, userProfileSchema, type UpdateUserProfileInput, type UserProfileData, type UserProfileResponse } from "@/schemas/users/userProfile.schema";
 import axios, {
   type AxiosInstance,
   type InternalAxiosRequestConfig,
@@ -60,6 +60,15 @@ export const userApiConnector = {
     });
 
     return userProfileSchema.parse(response.data).data;
+  },
+
+  getUserAvatar: async (userId: string): Promise<string> => {
+    const response = await api.get(`/user-profile/avatar/${userId}`);
+
+    const parsed = UserAvatarSchema.parse(response.data);
+    const { imageBytes, contentType } = parsed.data;
+
+    return `data:${contentType};base64,${imageBytes}`;
   },
 
 };
