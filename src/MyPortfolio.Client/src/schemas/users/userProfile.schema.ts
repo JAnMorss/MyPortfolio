@@ -7,7 +7,7 @@ export const userProfileSchema = z.object({
     age: z.number().int().nonnegative(),
     role: z.string(),
     email: z.string(),
-    photo: z.string(),
+    photo: z.string().url().nullable(),
     headLine: z.string(),
     about: z.string(),
     updatedAt: z.string().nullable() 
@@ -22,6 +22,16 @@ export const UpdateUserProfileSchema = z.object({
   headLine: z.string(),
   about: z.string(),
 });
+
+export const UserAvatarSchema = z.object({
+  data: z.object({
+    avatarUrl: z.string().url(),
+    imageBytes: z.string(),
+    contentType: z.string(),
+  }),
+  message: z.string()
+});
+
 
 export type UserProfileResponse = z.infer<typeof userProfileSchema>;
 
