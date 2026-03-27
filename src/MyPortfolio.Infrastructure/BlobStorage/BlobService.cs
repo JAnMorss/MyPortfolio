@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using MyPortfolio.Application.Abstractions.BlobStorage;
 
@@ -11,9 +12,9 @@ internal sealed class BlobService(BlobServiceClient blobServiceClient) : IBlobSe
         Guid fileId, 
         CancellationToken cancellationToken = default)
     {
-        var containerClient = blobServiceClient.GetBlobContainerClient(container);
+        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(container);
 
-        var blobClient = containerClient.GetBlobClient(fileId.ToString());
+        BlobClient blobClient = containerClient.GetBlobClient(fileId.ToString());
 
         await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
@@ -23,11 +24,11 @@ internal sealed class BlobService(BlobServiceClient blobServiceClient) : IBlobSe
         Guid fileId, 
         CancellationToken cancellationToken = default)
     {
-        var containerClient = blobServiceClient.GetBlobContainerClient(container);
+        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(container);
 
-        var blobClient = containerClient.GetBlobClient(fileId.ToString());
+        BlobClient blobClient = containerClient.GetBlobClient(fileId.ToString());
 
-        var response = await blobClient.DownloadContentAsync(cancellationToken: cancellationToken);
+        Response<BlobDownloadResult> response = await blobClient.DownloadContentAsync(cancellationToken: cancellationToken);
 
         return new FileResponse(
             response.Value.Content.ToStream(),
@@ -47,22 +48,25 @@ internal sealed class BlobService(BlobServiceClient blobServiceClient) : IBlobSe
 
     public async Task<Guid> UploadAsync(
         string container,
-        Stream stream, 
+        Stream stream,
         string contentType,
         CancellationToken cancellationToken = default)
     {
-        var containerClient = blobServiceClient.GetBlobContainerClient(container);
+        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(container);
 
-        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
+        await containerClient.CreateIfNotExistsAsync(
+            PublicAccessType.Blob,
+            cancellationToken: cancellationToken);
 
         var fileId = Guid.NewGuid();
 
-        var blobClient = containerClient.GetBlobClient(fileId.ToString());
+        BlobClient blobClient = containerClient.GetBlobClient(fileId.ToString());
 
         await blobClient.UploadAsync(
             stream,
             new BlobHttpHeaders { ContentType = contentType },
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         return fileId;
     }
