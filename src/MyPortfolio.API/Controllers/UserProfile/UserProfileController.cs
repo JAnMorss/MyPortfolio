@@ -68,14 +68,13 @@ public class UserProfileController : ApiController
             : HandleFailure(result);
     }
 
-    [HttpGet("avatar")]
-    public async Task<IActionResult> GetUserAvatar(CancellationToken cancellationToken)
+    [AllowAnonymous]
+    [HttpGet("avatar/{id:guid}")]
+    public async Task<IActionResult> GetUserAvatar(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
     {
-        var userId = GetUserId();
-        if (userId is null)
-            return Unauthorized();
-
-        var query = new GetUserAvatarQuery(userId.Value);
+        var query = new GetUserAvatarQuery(id);
 
         var result = await _sender.Send(query, cancellationToken);
 
