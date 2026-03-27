@@ -30,7 +30,8 @@ public sealed class Photo : ValueObject
     {
         try
         {
-            var fileName = Path.GetFileName(url);
+            var uri = new Uri(url);
+            var fileName = Path.GetFileName(uri.LocalPath);
             return Guid.TryParse(fileName, out var fileId) ? fileId : null;
         }
         catch
