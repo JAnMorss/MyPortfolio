@@ -92,7 +92,6 @@ export default function SidebarProfile() {
   });
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  // Ref for hidden file input
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (field: keyof LocalEditData, value: string | number) => {
@@ -104,13 +103,19 @@ export default function SidebarProfile() {
     queryFn: () => userApiConnector.getUserProfileById(USER_ID),
   });
 
+ const { data: avatarUrl } = useQuery<string>({
+    queryKey: ["userAvatar", USER_ID],
+    queryFn: () => userApiConnector.getUserAvatar(USER_ID),
+  });
+  
   const { mutate, isPending: isSaving } = useMutation<
     UserProfileData,
     Error,
     LocalEditData
   >({
     mutationFn: (payload) => {
-      const validatedPayload: UpdateUserProfileInput = UpdateUserProfileSchema.parse(payload);
+      const validatedPayload: UpdateUserProfileInput =
+        UpdateUserProfileSchema.parse(payload);
       return userApiConnector.updateUserProfile(validatedPayload);
     },
     onSuccess: (updatedData) => {
@@ -120,11 +125,10 @@ export default function SidebarProfile() {
     onError: (err: Error) => console.error("Failed to update:", err.message),
   });
 
-  // Mutation for avatar upload
   const { mutate: updateAvatar, isPending: isUploading } = useMutation({
     mutationFn: (file: File) => userApiConnector.updateUserAvatar(file),
-    onSuccess: (updatedData) => {
-      queryClient.setQueryData(["userProfile", USER_ID], updatedData);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userAvatar"] });
     },
     onError: (err: Error) => console.error("Avatar upload failed:", err.message),
   });
@@ -138,19 +142,26 @@ export default function SidebarProfile() {
     if (!data) return;
 
     const { fullName, age, headLine, about } = data;
-    const { firstName: firstNameFromApi, lastName: lastNameFromApi } = splitName(fullName);
+    const { firstName, lastName } = splitName(fullName);
 
     setLocalData({
-      firstName: firstNameFromApi,
-      lastName: lastNameFromApi,
+      firstName,
+      lastName,
       age,
       headLine,
       about: about || "",
     });
+
     setIsEditMode(true);
   };
 
-  const handleSave = () => mutate(localData);
+  const handleSave = () => {
+    mutate(localData, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["userAvatar", USER_ID] });
+      },
+    });
+  };
   const handleCancel = () => setIsEditMode(false);
 
   const handleAvatarClick = () => {
@@ -185,8 +196,8 @@ export default function SidebarProfile() {
       </div>
     );
 
-  const { fullName, email, photo, about, } = data;
-  const { firstName: firstNameFromApi, lastName: lastNameFromApi } = splitName(fullName);
+  const { fullName, email, about } = data;
+  const { firstName, lastName } = splitName(fullName);
 
   return (
     <div className="space-y-4">
@@ -194,7 +205,7 @@ export default function SidebarProfile() {
 
       <div className="relative w-[260px] h-[260px] mx-auto lg:mx-0">
         <img
-          src={photo || "https://i.pravatar.cc/260"}
+          src={avatarUrl}
           alt="Profile"
           className="w-full h-full rounded-full border border-gray-300 dark:border-gray-600 object-cover"
         />
@@ -204,8 +215,6 @@ export default function SidebarProfile() {
             onClick={handleAvatarClick}
             className="absolute bottom-2 right-2 flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur hover:bg-gray-100 dark:hover:bg-gray-700 transition"
             disabled={isUploading}
-            aria-label="Edit profile picture"
-            type="button"
           >
             <Pencil className="w-4 h-4" />
             {isUploading ? "Uploading..." : "Edit"}
@@ -224,16 +233,14 @@ export default function SidebarProfile() {
 
       <div className="flex gap-2 text-2xl">
         <EditableField
-          value={isEditMode ? localData.firstName : firstNameFromApi}
+          value={isEditMode ? localData.firstName : firstName}
           isEditMode={isEditMode}
           onChange={(val) => handleChange("firstName", val)}
-          placeholder="First Name"
         />
         <EditableField
-          value={isEditMode ? localData.lastName : lastNameFromApi}
+          value={isEditMode ? localData.lastName : lastName}
           isEditMode={isEditMode}
           onChange={(val) => handleChange("lastName", val)}
-          placeholder="Last Name"
         />
       </div>
 
@@ -243,7 +250,6 @@ export default function SidebarProfile() {
           onChange={(e) => handleChange("about", e.target.value)}
           className="w-full border rounded px-2 py-1"
           rows={4}
-          placeholder="About"
         />
       ) : (
         about && <p className="text-base text-gray-700 dark:text-gray-200">{about}</p>
