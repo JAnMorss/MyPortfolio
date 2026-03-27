@@ -1,4 +1,3 @@
-// src/components/header/Header.tsx
 import { useState } from "react";
 import ThemeToggle from "../ThemeToggle";
 import Logo from "./Logo";
@@ -30,8 +29,12 @@ export default function Header() {
             variant="outline"
             size="sm"
             onClick={() => {
-              if (isAuthenticated) logout();
-              else setIsLoginOpen(true);
+              if (isAuthenticated) {
+                logout();
+                window.location.reload();
+              } else {
+                setIsLoginOpen(true);
+              }
             }}
             className="flex items-center gap-1"
             title={isAuthenticated ? "Logout" : "Admin login"}
