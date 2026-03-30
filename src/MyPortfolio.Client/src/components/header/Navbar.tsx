@@ -1,51 +1,128 @@
-import { Home, GraduationCap, Briefcase, Award, MessageSquare } from 'lucide-react';
+"use client";
 
-interface NavbarProps {
-  activeSection: string;
-  onSectionChange: (section: string) => void;
-  isLightMode: boolean;
-}
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import {
+  Home,
+  GraduationCap,
+  Briefcase,
+  Award,
+  MessageSquare,
+  FolderKanban,
+  ChevronDown,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function Navbar({ activeSection, onSectionChange, isLightMode }: NavbarProps) {
+export default function Navbar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("token"));
+  }, []);
+
   const navItems = [
-    { id: 'overview', label: 'Overview', icon: Home },
-    { id: 'education', label: 'Education', icon: GraduationCap },
-    { id: 'skills', label: 'Skills', icon: Award },
-    { id: 'experience', label: 'Experience', icon: Briefcase },
-    { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { path: "/overview", label: "Overview", icon: Home },
+    { path: "/skills", label: "Skills", icon: Award },
+    { path: "/projects", label: "Projects", icon: FolderKanban },
+    { path: "/education", label: "Education", icon: GraduationCap },
+    { path: "/experience", label: "Experience", icon: Briefcase },
+    { path: "/messages", label: "Messages", icon: MessageSquare, auth: true },
   ];
 
+  const filteredNavItems = navItems.filter((item) => !item.auth || isLoggedIn);
+
+  const visibleItems = filteredNavItems.slice(0, 2);
+  const hiddenItems = filteredNavItems.slice(2);
+
   return (
-    <nav className={`border-b sticky top-0 z-10 ${
-      isLightMode 
-        ? 'bg-white border-[#d0d7de]' 
-        : 'bg-[#0d1117] border-[#30363d]'
-    }`}>
-      <div className="max-w-7xl mx-auto px-8">
-        <div className="flex items-center gap-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeSection === item.id;
-            
-            return (
+    <nav className="sticky top-0 z-10 border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-2 relative">
+          <div className="hidden md:flex items-center gap-2 w-full">
+            {filteredNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-4 border-b-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "border-[#fd8c73] text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-[#d0d7de] dark:hover:border-[#30363d]"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex md:hidden items-center gap-2 w-full">
+            {visibleItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-3 border-b-2 text-sm font-medium",
+                    isActive
+                      ? "border-[#fd8c73] text-foreground"
+                      : "border-transparent text-muted-foreground"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                </button>
+              );
+            })}
+
+            <div className="inline-block border-l border-[rgba(61,68,77,0.7)] w-px h-6"></div>
+
+            <div className="relative">
               <button
-                key={item.id}
-                onClick={() => onSectionChange(item.id)}
-                className={`flex items-center gap-2 px-4 py-4 border-b-2 transition-colors ${
-                  isActive
-                    ? isLightMode
-                      ? 'border-[#fd8c73] text-gray-900'
-                      : 'border-[#fd8c73] text-white'
-                    : isLightMode
-                      ? 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
-                      : 'border-transparent text-[#7d8590] hover:text-[#c9d1d9] hover:border-[#30363d]'
-                }`}
+                onClick={() => setOpen((prev) => !prev)}
+                className="flex items-center gap-1 px-4 py-3 text-sm text-muted-foreground border-b-2 border-transparent"
               >
-                <Icon className="w-4 h-4" />
-                <span className="text-sm font-medium">{item.label}</span>
+                More
+                <ChevronDown className="w-4 h-4" />
               </button>
-            );
-          })}
+
+              {open && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#161b22] border rounded-md shadow-lg z-50">
+                  {hiddenItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => {
+                          navigate(item.path);
+                          setOpen(false);
+                        }}
+                        className={cn(
+                          "w-full flex items-center gap-2 px-4 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-[#21262d]",
+                          isActive && "text-[#fd8c73]"
+                        )}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </nav>
