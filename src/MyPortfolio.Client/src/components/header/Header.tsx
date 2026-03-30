@@ -1,15 +1,13 @@
 import { useState } from "react";
 import ThemeToggle from "../ThemeToggle";
 import Logo from "./Logo";
-import { Navbar } from "./Navbar";
 import { Lock } from "lucide-react"; 
 import { Button } from "../ui/button";
 import LoginModal from "../modals/login-modal";
 import { useAuth } from "@/hooks/useAuth";
+import Navbar from "./Navbar";
 
 export default function Header() {
-  const [activeSection, setActiveSection] = useState("overview");
-  const [isLightMode, setIsLightMode] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const { isAuthenticated, logout } = useAuth();
@@ -45,7 +43,7 @@ export default function Header() {
         </div>
       </div>
 
-      <Navbar activeSection={activeSection} onSectionChange={setActiveSection} isLightMode={isLightMode} />
+      <Navbar />
 
       <LoginModal open={isLoginOpen} onOpenChange={setIsLoginOpen} />
     </header>
