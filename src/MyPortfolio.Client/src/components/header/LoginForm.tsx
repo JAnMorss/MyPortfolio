@@ -10,7 +10,7 @@ import type { ValidationError } from "@/schemas/ValidationError/validationError.
 import { useAuth } from "@/hooks/useAuth";
 
 interface LoginFormProps {
-  onLoginSuccess?: (message?: string) => void; 
+  onLoginSuccess?: (message?: string) => void;
 }
 
 export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
@@ -27,11 +27,14 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
     setIsLoading(true);
 
     const parsed = loginInputSchema.safeParse({ email, password });
+
     if (!parsed.success) {
-      setErrors(parsed.error.issues.map((err) => ({
-        propertyName: err.path[0] ? String(err.path[0]) : "Form",
-        errorMessage: err.message,
-      })));
+      setErrors(
+        parsed.error.issues.map((err) => ({
+          propertyName: err.path[0] ? String(err.path[0]) : "Form",
+          errorMessage: err.message,
+        }))
+      );
       setIsLoading(false);
       return;
     }
@@ -39,51 +42,93 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
     try {
       const response = await loginApiConnector.login(parsed.data);
       const { token, refreshToken } = response.data;
-      saveAuth(token, refreshToken); // save both tokens
 
-      if (onLoginSuccess) onLoginSuccess(response.message ?? "Login successful!");
+      // ✅ Save tokens
+      saveAuth(token, refreshToken);
+
+      // ✅ Show success message (optional)
+      if (onLoginSuccess) {
+        onLoginSuccess(response.message ?? "Login successful!");
+      }
+
+      // ✅ Reload page (same behavior as logout)
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+
     } catch (err: any) {
       if (err?.type === "validation") {
         setErrors(err.data.errors);
       } else {
-        setErrors([{
-          propertyName: "Form",
-          errorMessage: err?.response?.data?.detail || "Something went wrong. Only admin or owner of this portfolio can login.",
-        }]);
+        setErrors([
+          {
+            propertyName: "Form",
+            errorMessage:
+              err?.response?.data?.detail ||
+              "Something went wrong. Only admin or owner of this portfolio can login.",
+          },
+        ]);
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getFieldErrors = (field: string) => errors.filter((e) => e.propertyName === field);
+  const getFieldErrors = (field: string) =>
+    errors.filter((e) => e.propertyName === field);
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-      <p className="text-center text-sm text-warning">⚠️ Only admin or owner of this portfolio can login.</p>
+      <p className="text-center text-sm text-warning">
+        ⚠️ Only admin or owner of this portfolio can login.
+      </p>
 
       <div className="relative">
         <Separator />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2 text-xs text-white">LOGIN</span>
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2 text-xs text-white">
+          LOGIN
+        </span>
       </div>
 
       {getFieldErrors("Form").map((e, i) => (
-        <p key={i} className="text-sm text-red-600 text-center">{e.errorMessage}</p>
+        <p key={i} className="text-sm text-red-600 text-center">
+          {e.errorMessage}
+        </p>
       ))}
 
       <div className="space-y-1">
         <Label>Email</Label>
-        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        {getFieldErrors("Email").map((e, i) => <p key={i} className="text-sm text-red-600">{e.errorMessage}</p>)}
+        <Input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        {getFieldErrors("Email").map((e, i) => (
+          <p key={i} className="text-sm text-red-600">
+            {e.errorMessage}
+          </p>
+        ))}
       </div>
 
       <div className="space-y-1">
         <Label>Password</Label>
-        <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        {getFieldErrors("Password").map((e, i) => <p key={i} className="text-sm text-red-600">{e.errorMessage}</p>)}
+        <Input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {getFieldErrors("Password").map((e, i) => (
+          <p key={i} className="text-sm text-red-600">
+            {e.errorMessage}
+          </p>
+        ))}
       </div>
 
-      <Button className="w-full bg-blue-600 hover:bg-blue-700" size="lg" disabled={isLoading}>
+      <Button
+        className="w-full bg-blue-600 hover:bg-blue-700"
+        size="lg"
+        disabled={isLoading}
+      >
         {isLoading ? "Signing in..." : "Sign In"}
       </Button>
     </form>
