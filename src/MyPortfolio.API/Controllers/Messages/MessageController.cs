@@ -27,7 +27,6 @@ public class MessageController : ApiController
     }
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> GetAllMessages(
         [FromQuery] QueryObject queryObject,
         CancellationToken cancellationToken)
@@ -44,7 +43,6 @@ public class MessageController : ApiController
     }
 
     [HttpGet("{id:guid}")]
-    [AllowAnonymous]
     public async Task<IActionResult> GetMessageById(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
