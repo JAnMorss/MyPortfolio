@@ -25,7 +25,7 @@ export default function Navbar() {
 
   const navItems = [
     { path: "/overview", label: "Overview", icon: Home },
-    { path: "/skills", label: "Skills", icon: Award },
+    { path: "/skills", label: "Skills", icon: Award, auth: true},
     { path: "/projects", label: "Projects", icon: FolderKanban },
     { path: "/education", label: "Education", icon: GraduationCap },
     { path: "/experience", label: "Experience", icon: Briefcase },
@@ -44,7 +44,8 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2 w-full">
             {filteredNavItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
+              const currentPath = location.pathname === "/" ? "/overview" : location.pathname;
+              const isActive = currentPath === item.path;
 
               return (
                 <button
@@ -63,7 +64,6 @@ export default function Navbar() {
               );
             })}
           </div>
-
           <div className="flex md:hidden items-center gap-2 w-full">
             {visibleItems.map((item) => {
               const Icon = item.icon;
