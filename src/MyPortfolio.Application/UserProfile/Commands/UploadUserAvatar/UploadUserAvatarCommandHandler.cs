@@ -36,7 +36,6 @@ public sealed class UploadUserAvatarCommandHandler
             if (user is null)
                 return Result.Failure(UserErrors.NotFound);
 
-            // Delete old avatar
             if (user.Photo is not null)
             {
                 var existingFileId = Photo.ExtractFileIdFromUrl(user.Photo.Value);
