@@ -4,6 +4,7 @@ import type { ProjectItem } from "@/schemas/projects/project.schema";
 import CustomizePinsModal from "@/components/modals/CustomizePinsModal";
 import SkillsSection from "@/components/overview/SkillsSection";
 import PinnedProjects from "@/components/overview/PinnedProjects";
+import Contact from "@/components/overview/Contact";
 
 export default function OverviewPage() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
@@ -45,6 +46,8 @@ export default function OverviewPage() {
         />
 
         <SkillsSection />
+
+        <Contact />
 
         {isLoggedIn && (
             <CustomizePinsModal
