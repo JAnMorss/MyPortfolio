@@ -4,8 +4,7 @@ import type { SkillItem } from "@/schemas/skills/skill.schema";
 
 import { skillApiConnector } from "@/api.connector/skill/skill.api.connector";
 import { timeAgoPH } from "@/utils/timeAgo";
-
-import { Progress } from "@/components/ui/progress";
+ 
 
 // GitHub-inspired colors for skill levels
 const levelPercentage: Record<string, number> = {
@@ -58,7 +57,6 @@ export default function SkillsSection() {
                   {skill.skillName}
                 </span>
               </div>
-
                 <div className="mb-2">
                     <div className="w-full h-2 rounded-full bg-gray-300 dark:bg-gray-700 overflow-hidden">
                         <div
@@ -67,11 +65,6 @@ export default function SkillsSection() {
                         />
                     </div>
                 </div>
-
-              <p className="text-xs text-muted-foreground mt-1">
-                Created: {timeAgoPH(skill.createdAt)}
-                {skill.updatedAt && <> • Updated: {timeAgoPH(skill.updatedAt)}</>}
-              </p>
             </div>
           );
         })}
