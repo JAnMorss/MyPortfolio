@@ -3,7 +3,7 @@ import AppLayout from "../AppLayout";
 import OverviewPage from "@/pages/OverviewPage";
 import EducationsPage from "@/pages/EducationsPage";
 import SkillsPage from "@/pages/SkillsPage";
-import ExperiencesPage from "@/pages/ExperiencesPage";
+import ExperiencesPage from "@/pages/ExperiencePage";
 import ProjectsPage from "@/pages/ProjectsPage";
 import MessagesPage from "@/pages/MessagesPage";
 
