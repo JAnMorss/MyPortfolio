@@ -25,8 +25,17 @@ export const projectListSchema = z.object({
 export const ProjectInputSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  techstack: z.string().min(1, "Techstack is required"), // comma-separated string
+  techstack: z.string().min(1, "Techstack is required"),
   link: z.string().url("Must be a valid URL"),
+});
+
+export const ProjectMediaSchema = z.object({
+  data: z.object({
+    mediaUrl: z.string().url(),
+    imageBytes: z.string(),
+    contentType: z.string(),
+  }),
+  message: z.string()
 });
 
 export type ProjectListResponse = z.infer<typeof projectListSchema>;
