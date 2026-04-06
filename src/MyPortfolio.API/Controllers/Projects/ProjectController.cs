@@ -11,6 +11,7 @@ using MyPortfolio.Application.Projects.Commands.UpdateProject;
 using MyPortfolio.Application.Projects.Commands.UploadProjectMedia;
 using MyPortfolio.Application.Projects.Queries.GetAllProjects;
 using MyPortfolio.Application.Projects.Queries.GetProjectById;
+using MyPortfolio.Application.Projects.Queries.GetProjectMedia;
 using MyPortfolio.Application.Projects.Responses;
 using MyPortfolio.SharedKernel.Helpers;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -126,11 +127,28 @@ public class ProjectController : ApiController
             : HandleFailure(result);
     }
 
+    [AllowAnonymous]
+    [HttpGet("media/{id:guid}")]
+    public async Task<IActionResult> GetProjectMedia(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetProjectMediaQuery(id);
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(new ApiResponse<ProjectMediaResponse>(
+                result.Value,
+                "Project media retrieved successfully."))
+            : HandleFailure(result);
+    }
+
     [HttpPut("{id:guid}/media")]
     public async Task<IActionResult> UploadProjectMedia(
-    [FromRoute] Guid id,
-    IFormFile file,
-    CancellationToken cancellationToken)
+        [FromRoute] Guid id,
+        IFormFile file,
+        CancellationToken cancellationToken)
     {
         var command = new UploadProjectMediaCommand(id, file);
 
