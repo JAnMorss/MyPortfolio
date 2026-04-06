@@ -43,7 +43,6 @@ api.interceptors.response.use(
 );
 
 export const educationApiConnector = {
-  /* GET ALL */
   getEducations: async (): Promise<EducationListData> => {
     const response = await api.get("/educations");
     return educationListSchema.parse(response.data).data;
