@@ -1,4 +1,3 @@
-// src/api.connector/auth/login.api.connector.ts
 import { loginInputSchema, loginResponseSchema, type LoginApiResponse } from "@/schemas/login/login.schema";
 import { validationResponseSchema } from "@/schemas/ValidationError/validationError.schema";
 import axios, { AxiosHeaders, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
