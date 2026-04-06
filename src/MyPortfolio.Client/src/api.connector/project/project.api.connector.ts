@@ -4,7 +4,8 @@ import {
   ProjectInputSchema,
   type ProjectListData,
   type ProjectItem,
-  type ProjectInput
+  type ProjectInput,
+  ProjectMediaSchema
 } from "@/schemas/projects/project.schema";
 
 import axios, {
@@ -86,6 +87,29 @@ export const projectApiConnector = {
     await api.delete(`/project/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getProjectMedia: async (id: string) => {
+    const response = await api.get(`/project/media/${id}`);
+
+    const parsed = ProjectMediaSchema.parse(response.data);
+
+    return parsed.data; 
+  },
+
+  updateProjectMedia: async (id: string, file: File): Promise<void> => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Unauthorized");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    await api.put(`/project/${id}/media`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
       },
     });
   },
