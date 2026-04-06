@@ -1,12 +1,8 @@
-// File: components/skill/SkillsSection.tsx
 import { useEffect, useState } from "react";
 import type { SkillItem } from "@/schemas/skills/skill.schema";
 
 import { skillApiConnector } from "@/api.connector/skill/skill.api.connector";
-import { timeAgoPH } from "@/utils/timeAgo";
- 
 
-// GitHub-inspired colors for skill levels
 const levelPercentage: Record<string, number> = {
   Beginner: 33,
   Intermediate: 66,
