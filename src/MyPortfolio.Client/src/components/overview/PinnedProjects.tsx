@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import type { ProjectItem } from "@/schemas/projects/project.schema";
 import { timeAgoPH } from "@/utils/timeAgo";
 import { useState } from "react";
-import LoginModal from "@/components/modals/login-modal"; // import your LoginModal
+import LoginModal from "@/components/modals/login-modal";
 
 interface PinnedProjectsProps {
   projects: ProjectItem[];
   pinnedIds: string[];
   isLoggedIn: boolean;
-  onOpenModal: () => void; // customize pins modal
+  onOpenModal: () => void;
 }
 
 export default function PinnedProjects({
@@ -18,7 +18,7 @@ export default function PinnedProjects({
   isLoggedIn,
   onOpenModal,
 }: PinnedProjectsProps) {
-  const [isLoginOpen, setIsLoginOpen] = useState(false); // login modal state
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const getProjectById = (id: string) => projects.find((p) => p.id === id);
 
@@ -40,10 +40,10 @@ export default function PinnedProjects({
 
       <div className="flex justify-between items-center">
         <h2 className="text-base font-semibold text-[#24292f] dark:text-[#c9d1d9]">
-          Pinned
+          Pinned Projects
         </h2>
         <Button variant="outline" size="sm" onClick={handlePinClick}>
-          Customize your pins
+          Customize your project
         </Button>
       </div>
 
