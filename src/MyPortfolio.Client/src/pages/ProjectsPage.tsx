@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { projectApiConnector } from "@/api.connector/project/project.api.connector";
-import { BookOpen, ExternalLink, Trash2, Edit } from "lucide-react";
+import { BookOpen, Trash2, Edit, Image } from "lucide-react";
 import ProjectModal from "@/components/modals/ProjectModal";
+import ProjectMediaModal from "@/components/modals/ProjectMediaModal";
 import { timeAgoPH } from "@/utils/timeAgo";
 
 export default function ProjectPage() {
@@ -18,7 +19,11 @@ export default function ProjectPage() {
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState<ProjectItem | null>(null);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // check login
+  // ✅ MEDIA MODAL STATE
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
@@ -100,18 +105,11 @@ export default function ProjectPage() {
 
       <div className="divide-y">
         {filtered.map((project) => (
-          <div
-            key={project.id}
-            className="py-5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded transition-colors duration-150 px-3"
-          >
+          <div key={project.id} className="py-5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded px-3">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-muted-foreground" />
-                <a
-                  href={project.link || "#"}
-                  target="_blank"
-                  className="text-blue-600 font-semibold text-lg hover:underline"
-                >
+                <a href={project.link || "#"} target="_blank" className="text-blue-600 font-semibold text-lg hover:underline">
                   {project.title}
                 </a>
                 <span className="text-xs border rounded-full px-2 py-0.5 text-muted-foreground">
@@ -120,22 +118,28 @@ export default function ProjectPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                {project.link && (
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    className="text-muted-foreground hover:text-blue-500"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                )}
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedProjectId(project.id);
+                    setShowMediaModal(true);
+                  }}
+                >
+                  <Image className="w-4 h-4 mr-1" />
+                  Preview
+                </Button>
 
                 {isLoggedIn && (
                   <>
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => { setModalProject(project); setShowModal(true); }}
+                      onClick={() => {
+                        setModalProject(project);
+                        setShowModal(true);
+                      }}
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -158,29 +162,18 @@ export default function ProjectPage() {
 
             <div className="flex flex-wrap gap-2 mb-2">
               {project.techstack.split(",").map((tech, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-150 cursor-pointer"
-                >
+                <span key={index} className="px-3 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700">
                   {tech.trim()}
                 </span>
               ))}
             </div>
 
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span>Created: {timeAgoPH(project.createdAt)}</span>
-                {project.updatedAt && (
-                    <span>Updated: {timeAgoPH(project.updatedAt)}</span>
-                )}
+            <div className="flex gap-4 text-xs text-muted-foreground">
+              <span>Created: {timeAgoPH(project.createdAt)}</span>
+              {project.updatedAt && <span>Updated: {timeAgoPH(project.updatedAt)}</span>}
             </div>
           </div>
         ))}
-
-        {filtered.length === 0 && (
-          <p className="text-center text-muted-foreground py-10">
-            No repositories found.
-          </p>
-        )}
       </div>
 
       {showModal && (
@@ -191,6 +184,13 @@ export default function ProjectPage() {
             setShowModal(false);
             fetchProjects();
           }}
+        />
+      )}
+
+      {showMediaModal && selectedProjectId && (
+        <ProjectMediaModal
+          projectId={selectedProjectId}
+          onClose={() => setShowMediaModal(false)}
         />
       )}
     </div>
