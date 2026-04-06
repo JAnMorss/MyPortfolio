@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 import { experienceApiConnector } from "@/api.connector/experience/experience.api.connector";
+import { ExperienceInputSchema } from "@/schemas/experience/experience.schema";
+import type { ValidationError } from "@/schemas/ValidationError/validationError.schema";
 
 type Props = {
   experience?: ExperienceItem;
@@ -29,6 +31,7 @@ export default function ExperienceModal({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState<string | null>(null);
   const [description, setDescription] = useState("");
+  const [errors, setErrors] = useState<ValidationError[]>([]);
 
   useEffect(() => {
     if (experience) {
@@ -40,28 +43,60 @@ export default function ExperienceModal({
   }, [experience]);
 
   const handleSubmit = async () => {
-    try {
-      const payload = {
-        companyName,
-        startDate: new Date(startDate).toISOString(),
-        endDate: endDate ? new Date(endDate).toISOString() : null,
-        description,
-      };
+    setErrors([]);
+    const rawPayload = {
+      companyName,
+      startDate,
+      endDate,
+      description,
+    };
 
+    const parsed = ExperienceInputSchema.safeParse(rawPayload);
+
+    if (!parsed.success) {
+      setErrors(
+        parsed.error.issues.map((err) => ({
+          propertyName: err.path[0] ? String(err.path[0]) : "Form",
+          errorMessage: err.message,
+        }))
+      );
+      return;
+    }
+
+    const apiPayload = {
+      ...parsed.data,
+      startDate: new Date(parsed.data.startDate).toISOString(),
+      endDate: parsed.data.endDate ? new Date(parsed.data.endDate).toISOString() : null,
+    };
+
+    try {
       if (experience) {
         await experienceApiConnector.updateExperience(
           experience.id,
-          payload
+          apiPayload
         );
       } else {
-        await experienceApiConnector.createExperience(payload);
+        await experienceApiConnector.createExperience(apiPayload);
       }
 
       onSuccess();
-    } catch (error) {
-      console.error("Failed to save experience", error);
+    } catch (err: any) {
+      if (err?.type === "validation") {
+        setErrors(err.data.errors);
+      } else {
+        setErrors([
+          {
+            propertyName: "Form",
+            errorMessage:
+              err?.response?.data?.detail || "Something went wrong.",
+          },
+        ]);
+      }
     }
   };
+
+  const getFieldErrors = (field: string) =>
+    errors.filter((e) => e.propertyName === field);
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -72,35 +107,69 @@ export default function ExperienceModal({
           </DialogTitle>
         </DialogHeader>
 
+        {getFieldErrors("Form").map((e, i) => (
+          <p key={i} className="text-sm text-red-600 text-center">
+            {e.errorMessage}
+          </p>
+        ))}
+
         <div className="space-y-4">
-          <Input
-            placeholder="Company Name"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-          />
-
-          <div className="flex gap-2">
+          <div className="space-y-1">
             <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              placeholder="Company Name"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
             />
-
-            <Input
-              type="date"
-              value={endDate ?? ""}
-              onChange={(e) =>
-                setEndDate(e.target.value || null)
-              }
-              placeholder="End Date (optional)"
-            />
+            {getFieldErrors("companyName").map((e, i) => (
+              <p key={i} className="text-sm text-red-600">
+                {e.errorMessage}
+              </p>
+            ))}
           </div>
 
-          <Textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          <div className="flex gap-2">
+            <div className="space-y-1 flex-1">
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              {getFieldErrors("startDate").map((e, i) => (
+                <p key={i} className="text-sm text-red-600">
+                  {e.errorMessage}
+                </p>
+              ))}
+            </div>
+
+            <div className="space-y-1 flex-1">
+              <Input
+                type="date"
+                value={endDate ?? ""}
+                onChange={(e) =>
+                  setEndDate(e.target.value || null)
+                }
+                placeholder="End Date (optional)"
+              />
+              {getFieldErrors("endDate").map((e, i) => (
+                <p key={i} className="text-sm text-red-600">
+                  {e.errorMessage}
+                </p>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Textarea
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            {getFieldErrors("description").map((e, i) => (
+              <p key={i} className="text-sm text-red-600">
+                {e.errorMessage}
+              </p>
+            ))}
+          </div>
 
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={onClose}>
