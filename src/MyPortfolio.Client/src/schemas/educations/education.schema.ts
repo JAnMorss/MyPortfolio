@@ -25,7 +25,7 @@ export const educationListSchema = z.object({
 export const EducationInputSchema = z.object({
   school: z.string().min(1, "School is required"),
   degree: z.string().min(1, "Degree is required"),
-  startDate: z.string(),
+  startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().nullable().optional(),
   description: z.string().min(1, "Description is required"),
 });
