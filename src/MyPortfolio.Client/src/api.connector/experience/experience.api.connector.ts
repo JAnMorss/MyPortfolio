@@ -23,9 +23,6 @@ const api: AxiosInstance = axios.create({
   },
 });
 
-/* ========================= */
-/* 🔐 Attach Token */
-/* ========================= */
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("token");
