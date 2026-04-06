@@ -1,4 +1,3 @@
-// src/contexts/AuthProvider.tsx
 import { useState, createContext, useContext, useEffect } from "react";
 
 type AuthContextType = {
