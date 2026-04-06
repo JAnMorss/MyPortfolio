@@ -1,4 +1,3 @@
-// src/components/header/LoginForm.tsx
 import { useState } from "react";
 import { loginApiConnector } from "@/api.connector/auth/login.api.connector";
 import { loginInputSchema } from "@/schemas/login/login.schema";
@@ -43,15 +42,12 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       const response = await loginApiConnector.login(parsed.data);
       const { token, refreshToken } = response.data;
 
-      // ✅ Save tokens
       saveAuth(token, refreshToken);
 
-      // ✅ Show success message (optional)
       if (onLoginSuccess) {
         onLoginSuccess(response.message ?? "Login successful!");
       }
 
-      // ✅ Reload page (same behavior as logout)
       setTimeout(() => {
         window.location.reload();
       }, 500);
