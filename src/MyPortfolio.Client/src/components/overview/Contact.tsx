@@ -5,6 +5,7 @@ import { Mail, Send, X } from "lucide-react";
 
 import { messageApiConnector } from "@/api.connector/message/message.api.connector";
 import { MessageInputSchema, type MessageInput } from "@/schemas/message/message.schema";
+import type { ValidationError } from "@/schemas/ValidationError/validationError.schema";
 
 export default function Contact() {
   const [formData, setFormData] = useState<MessageInput>({
@@ -16,6 +17,10 @@ export default function Contact() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modal, setModal] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [errors, setErrors] = useState<ValidationError[]>([]);
+
+  const getFieldErrors = (field: string) =>
+    errors.filter((e) => e.propertyName === field);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -23,12 +28,24 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors([]);
     setIsSubmitting(true);
 
-    try {
-      const validData = MessageInputSchema.parse(formData);
+    const parsed = MessageInputSchema.safeParse(formData);
 
-      await messageApiConnector.sendMessage(validData);
+    if (!parsed.success) {
+      setErrors(
+        parsed.error.issues.map((err) => ({
+          propertyName: err.path[0] ? String(err.path[0]) : "Form",
+          errorMessage: err.message,
+        }))
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      await messageApiConnector.sendMessage(parsed.data);
 
       setModal({ message: "Thank you for your message! I'll get back to you soon.", type: "success" });
 
@@ -38,15 +55,12 @@ export default function Contact() {
         phoneNumber: "",
         content: "",
       });
-    } catch (error: any) {
-      if (error?.issues) {
-        setModal({
-          message: "Validation failed: " + error.issues.map((i: any) => i.message).join(", "),
-          type: "error",
-        });
+    } catch (err: any) {
+      if (err?.type === "validation") {
+        setErrors(err.data.errors);
       } else {
         setModal({ message: "You have already sent a message with this name, email, or contact. Only one submission is allowed per user.", type: "error" });
-        console.error(error);
+        console.error(err);
       }
     } finally {
       setIsSubmitting(false);
@@ -55,7 +69,6 @@ export default function Contact() {
 
   return (
     <div className="space-y-6 relative">
-      {/* Modal */}
       {modal && (
         <div className="fixed top-4 right-4 z-50 w-80 p-4 rounded-md shadow-lg flex items-start gap-3
                         bg-white border border-gray-300 text-gray-800
@@ -68,7 +81,6 @@ export default function Contact() {
         </div>
       )}
 
-      {/* Header */}
       <div className="p-4 border rounded-md flex items-start gap-3">
         <Mail className="w-5 h-5 text-primary mt-0.5" />
         <div>
@@ -79,10 +91,14 @@ export default function Contact() {
         </div>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="p-6 border rounded-md space-y-4">
+        {getFieldErrors("Form").map((e, i) => (
+          <p key={i} className="text-sm text-red-600 text-center">
+            {e.errorMessage}
+          </p>
+        ))}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className="space-y-1">
             <label htmlFor="personName" className="block text-sm font-semibold mb-2">
               Name
             </label>
@@ -92,13 +108,17 @@ export default function Contact() {
               name="personName"
               value={formData.personName}
               onChange={handleChange}
-              required
               className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:border-blue-500"
               placeholder="Your name"
             />
+            {getFieldErrors("personName").map((e, i) => (
+              <p key={i} className="text-sm text-red-600">
+                {e.errorMessage}
+              </p>
+            ))}
           </div>
 
-          <div>
+          <div className="space-y-1">
             <label htmlFor="email" className="block text-sm font-semibold mb-2">
               Email
             </label>
@@ -108,14 +128,18 @@ export default function Contact() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              required
               className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:border-blue-500"
               placeholder="your.email@example.com"
             />
+            {getFieldErrors("email").map((e, i) => (
+              <p key={i} className="text-sm text-red-600">
+                {e.errorMessage}
+              </p>
+            ))}
           </div>
         </div>
 
-        <div>
+        <div className="space-y-1">
           <label htmlFor="phoneNumber" className="block text-sm font-semibold mb-2">
             Contact
           </label>
@@ -125,13 +149,17 @@ export default function Contact() {
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleChange}
-            required
             className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:border-blue-500"
             placeholder="Your phone number"
           />
+          {getFieldErrors("phoneNumber").map((e, i) => (
+            <p key={i} className="text-sm text-red-600">
+              {e.errorMessage}
+            </p>
+          ))}
         </div>
 
-        <div>
+        <div className="space-y-1">
           <label htmlFor="content" className="block text-sm font-semibold mb-2">
             Message
           </label>
@@ -140,11 +168,15 @@ export default function Contact() {
             name="content"
             value={formData.content}
             onChange={handleChange}
-            required
             rows={6}
             className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:border-blue-500 resize-none"
             placeholder="Tell me about your project..."
           />
+          {getFieldErrors("content").map((e, i) => (
+            <p key={i} className="text-sm text-red-600">
+              {e.errorMessage}
+            </p>
+          ))}
         </div>
 
         <button
