@@ -23,7 +23,7 @@ export const experienceListSchema = z.object({
 
 export const ExperienceInputSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
-  startDate: z.string(), 
+  startDate: z.string().min(1, "Start date is required"), 
   endDate: z.string().nullable().optional(),
   description: z.string().min(1, "Description is required"),
 });
