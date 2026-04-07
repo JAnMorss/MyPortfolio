@@ -71,4 +71,9 @@ export const userApiConnector = {
     return `data:${contentType};base64,${imageBytes}`;
   },
 
+  incrementProfileView: async (): Promise<number> => {
+    const response = await api.post(`/user-profile/view`);
+    return response.data.data as number;
+  },
+
 };
