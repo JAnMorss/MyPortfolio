@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Github, Linkedin, Mail, Users, Pencil } from "lucide-react";
-import type {
-  UserProfileData,
-  UpdateUserProfileInput,
-} from "@/schemas/users/userProfile.schema";
+import type { UserProfileData, UpdateUserProfileInput } from "@/schemas/users/userProfile.schema";
 import { UpdateUserProfileSchema } from "@/schemas/users/userProfile.schema";
 import { userApiConnector } from "@/api.connector/user/user.api.connector";
 import { useAuth } from "@/hooks/useAuth";
 import LoginModal from "../modals/login-modal";
+import { profileSignalR } from "@/services/profileSignalR";
 
 const USER_ID = "4AB06C35-908E-4697-8A35-5E7546C292D2";
 
@@ -86,12 +84,9 @@ export default function SidebarProfile() {
   const queryClient = useQueryClient();
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const [localData, setLocalData] = useState<LocalEditData>({
-    firstName: "",
-    lastName: "",
-  });
+  const [localData, setLocalData] = useState<LocalEditData>({ firstName: "", lastName: "" });
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
+  const [views, setViews] = useState<number>(0); // <-- Real-time views
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (field: keyof LocalEditData, value: string | number) => {
@@ -103,19 +98,14 @@ export default function SidebarProfile() {
     queryFn: () => userApiConnector.getUserProfileById(USER_ID),
   });
 
- const { data: avatarUrl } = useQuery<string>({
+  const { data: avatarUrl } = useQuery<string>({
     queryKey: ["userAvatar", USER_ID],
     queryFn: () => userApiConnector.getUserAvatar(USER_ID),
   });
-  
-  const { mutate, isPending: isSaving } = useMutation<
-    UserProfileData,
-    Error,
-    LocalEditData
-  >({
+
+  const { mutate, isPending: isSaving } = useMutation<UserProfileData, Error, LocalEditData>({
     mutationFn: (payload) => {
-      const validatedPayload: UpdateUserProfileInput =
-        UpdateUserProfileSchema.parse(payload);
+      const validatedPayload: UpdateUserProfileInput = UpdateUserProfileSchema.parse(payload);
       return userApiConnector.updateUserProfile(validatedPayload);
     },
     onSuccess: (updatedData) => {
@@ -144,14 +134,7 @@ export default function SidebarProfile() {
     const { fullName, age, headLine, about } = data;
     const { firstName, lastName } = splitName(fullName);
 
-    setLocalData({
-      firstName,
-      lastName,
-      age,
-      headLine,
-      about: about || "",
-    });
-
+    setLocalData({ firstName, lastName, age, headLine, about: about || "" });
     setIsEditMode(true);
   };
 
@@ -162,6 +145,7 @@ export default function SidebarProfile() {
       },
     });
   };
+
   const handleCancel = () => setIsEditMode(false);
 
   const handleAvatarClick = () => {
@@ -174,10 +158,24 @@ export default function SidebarProfile() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      updateAvatar(file);
-    }
+    if (file) updateAvatar(file);
   };
+
+  useEffect(() => {
+    if (!USER_ID) return;
+
+    profileSignalR.connect(USER_ID, (updatedViews) => {
+      setViews(updatedViews);
+    });
+
+    userApiConnector.incrementProfileView()
+      .then((initialViews) => setViews(initialViews))
+      .catch(console.error);
+
+    return () => {
+      profileSignalR.disconnect();
+    };
+  }, []);
 
   if (isLoading)
     return (
@@ -282,7 +280,7 @@ export default function SidebarProfile() {
 
       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
         <Users className="w-4 h-4" />
-        <span className="font-semibold text-gray-900 dark:text-gray-100">3</span> People View Your Portfolio
+        <span className="font-semibold text-gray-900 dark:text-gray-100">{views}</span> People View Your Portfolio
       </div>
 
       <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
@@ -291,11 +289,7 @@ export default function SidebarProfile() {
           url="https://www.linkedin.com/in/john-anthony-morales-a401b4276/"
           label="in/john-anthony-morales-a401b4276"
         />
-        <SocialLink
-          icon={Github}
-          url="https://github.com/JAnMorss"
-          label="github.com/JAnMorss"
-        />
+        <SocialLink icon={Github} url="https://github.com/JAnMorss" label="github.com/JAnMorss" />
         <SocialLink icon={Mail} label={email} />
       </div>
     </div>
