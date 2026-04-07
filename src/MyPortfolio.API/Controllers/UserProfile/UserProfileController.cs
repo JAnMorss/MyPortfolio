@@ -6,6 +6,7 @@ using MyPortfolio.API.Abstractions;
 using MyPortfolio.API.Controllers.UserProfile.Requests;
 using MyPortfolio.Application.UserProfile.Commands.ChangeEmail;
 using MyPortfolio.Application.UserProfile.Commands.ChangePassword;
+using MyPortfolio.Application.UserProfile.Commands.IncrementProfileView;
 using MyPortfolio.Application.UserProfile.Commands.UpdateDetails;
 using MyPortfolio.Application.UserProfile.Commands.UploadUserAvatar;
 using MyPortfolio.Application.UserProfile.Queries.GetProfile;
@@ -144,5 +145,24 @@ public class UserProfileController : ApiController
         return result.IsSuccess
             ? Ok(new ApiResponse("Email updated successfully"))
             : HandleFailure(result);
+    }
+
+    [HttpPost("view")]
+    [AllowAnonymous]
+    public async Task<IActionResult> IncrementView(
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+            return Unauthorized();
+
+        var command = new IncrementProfileViewCommand(userId.Value);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+
+        return Ok(result.Value);
     }
 }
