@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyPortfolio.API.Extensions;
+using MyPortfolio.API.Hubs;
 using MyPortfolio.Application;
 using MyPortfolio.Infrastructure;
 using MyPortfolio.Infrastructure.Seeding;
@@ -31,7 +32,11 @@ builder.Services.AddCors(opt =>
     });
 });
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
+
+app.MapHub<ProfileHub>("/hubs/profile");
 
 using (var scope = app.Services.CreateScope())
 {
