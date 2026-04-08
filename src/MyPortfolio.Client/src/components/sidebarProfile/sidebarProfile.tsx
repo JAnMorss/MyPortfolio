@@ -1,16 +1,38 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Github, Linkedin, Mail, Users, Pencil } from "lucide-react";
-import type { UserProfileData, UpdateUserProfileInput } from "@/schemas/users/userProfile.schema";
-import { UpdateUserProfileSchema } from "@/schemas/users/userProfile.schema";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { Github, Linkedin, Mail } from "lucide-react";
+
+import {
+  UpdateUserProfileSchema,
+  type UserProfileData,
+} from "@/schemas/users/userProfile.schema";
 import { userApiConnector } from "@/api.connector/user/user.api.connector";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/auth/useAuth";
+
 import LoginModal from "../modals/login-modal";
-import { profileSignalR } from "@/services/profileSignalR";
+import EditableField from "./EditableField";
+import SocialLink from "./SocialLink";
+import ProfileAvatar from "./ProfileAvatar";
+import ProfileViews from "./ProfileViews";
+
+import { connection } from "@/lib/signalr";
 
 const USER_ID = "4AB06C35-908E-4697-8A35-5E7546C292D2";
+
+const splitName = (fullName: string) => {
+  const parts = fullName.trim().split(" ");
+
+  return {
+    firstName: parts.slice(0, -1).join(" "),
+    lastName: parts[parts.length - 1] || "",
+  };
+};
 
 type LocalEditData = {
   firstName: string;
@@ -20,80 +42,56 @@ type LocalEditData = {
   about?: string;
 };
 
-const splitName = (fullName: string) => {
-  const parts = fullName.trim().split(" ");
-  return {
-    firstName: parts.slice(0, -1).join(" "),
-    lastName: parts[parts.length - 1] || "",
-  };
-};
-
-function EditableField({
-  value,
-  isEditMode,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  isEditMode: boolean;
-  onChange: (val: string) => void;
-  placeholder?: string;
-}) {
-  return isEditMode ? (
-    <input
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="border rounded px-2 py-1 w-full"
-    />
-  ) : (
-    <p>{value}</p>
-  );
-}
-
-function SocialLink({
-  icon: Icon,
-  url,
-  label,
-}: {
-  icon: React.ElementType;
-  url?: string;
-  label: string;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <Icon className="w-4 h-4" />
-      {url ? (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline truncate"
-        >
-          {label}
-        </a>
-      ) : (
-        <span>{label}</span>
-      )}
-    </div>
-  );
-}
-
 export default function SidebarProfile() {
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const [localData, setLocalData] = useState<LocalEditData>({ firstName: "", lastName: "" });
+  const [localData, setLocalData] = useState<LocalEditData>({
+    firstName: "",
+    lastName: "",
+  });
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [views, setViews] = useState<number>(0); // <-- Real-time views
+  const [views, setViews] = useState<number>(0);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleChange = (field: keyof LocalEditData, value: string | number) => {
-    setLocalData((prev) => ({ ...prev, [field]: value }));
+  useEffect(() => {
+    let isMounted = true;
+
+    const startConnection = async () => {
+      try {
+        if (connection.state === "Disconnected") {
+          await connection.start();
+        }
+
+        connection.on("ReceiveViewCount", (count: number) => {
+          if (isMounted) setViews(count);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    startConnection();
+
+    return () => {
+      isMounted = false;
+      connection.off("ReceiveViewCount");
+    };
+  }, []);
+
+  const handleChange = (
+    field: keyof LocalEditData,
+    value: string | number
+  ) => {
+    setLocalData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  const { data, isLoading, isError, error } = useQuery<UserProfileData, Error>({
+  const { data } = useQuery<UserProfileData>({
     queryKey: ["userProfile", USER_ID],
     queryFn: () => userApiConnector.getUserProfileById(USER_ID),
   });
@@ -103,131 +101,91 @@ export default function SidebarProfile() {
     queryFn: () => userApiConnector.getUserAvatar(USER_ID),
   });
 
-  const { mutate, isPending: isSaving } = useMutation<UserProfileData, Error, LocalEditData>({
-    mutationFn: (payload) => {
-      const validatedPayload: UpdateUserProfileInput = UpdateUserProfileSchema.parse(payload);
-      return userApiConnector.updateUserProfile(validatedPayload);
-    },
+  const { mutate, isPending: isSaving } = useMutation<
+    UserProfileData,
+    Error,
+    LocalEditData
+  >({
+    mutationFn: (payload) =>
+      userApiConnector.updateUserProfile(
+        UpdateUserProfileSchema.parse(payload)
+      ),
     onSuccess: (updatedData) => {
       queryClient.setQueryData(["userProfile", USER_ID], updatedData);
       setIsEditMode(false);
     },
-    onError: (err: Error) => console.error("Failed to update:", err.message),
   });
 
-  const { mutate: updateAvatar, isPending: isUploading } = useMutation({
-    mutationFn: (file: File) => userApiConnector.updateUserAvatar(file),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userAvatar"] });
-    },
-    onError: (err: Error) => console.error("Avatar upload failed:", err.message),
+  const {
+    mutate: updateAvatar,
+    isPending: isUploading,
+  } = useMutation({
+    mutationFn: (file: File) =>
+      userApiConnector.updateUserAvatar(file),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["userAvatar"] }),
   });
 
   const handleEditClick = () => {
-    if (!isAuthenticated) {
-      setIsLoginOpen(true);
-      return;
-    }
-
+    if (!isAuthenticated) return setIsLoginOpen(true);
     if (!data) return;
 
     const { fullName, age, headLine, about } = data;
     const { firstName, lastName } = splitName(fullName);
 
-    setLocalData({ firstName, lastName, age, headLine, about: about || "" });
+    setLocalData({
+      firstName,
+      lastName,
+      age,
+      headLine,
+      about: about || "",
+    });
+
     setIsEditMode(true);
   };
 
-  const handleSave = () => {
+  const handleSave = () =>
     mutate(localData, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["userAvatar", USER_ID] });
-      },
+      onSuccess: () =>
+        queryClient.invalidateQueries({
+          queryKey: ["userAvatar", USER_ID],
+        }),
     });
-  };
 
   const handleCancel = () => setIsEditMode(false);
 
   const handleAvatarClick = () => {
-    if (!isAuthenticated) {
-      setIsLoginOpen(true);
-      return;
-    }
+    if (!isAuthenticated) return setIsLoginOpen(true);
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) updateAvatar(file);
   };
 
-  useEffect(() => {
-    if (!USER_ID) return;
-
-    profileSignalR.connect(USER_ID, (updatedViews) => {
-      setViews(updatedViews);
-    });
-
-    userApiConnector.incrementProfileView()
-      .then((initialViews) => setViews(initialViews))
-      .catch(console.error);
-
-    return () => {
-      profileSignalR.disconnect();
-    };
-  }, []);
-
-  if (isLoading)
-    return (
-      <div className="p-4 space-y-2 animate-pulse">
-        <div className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto" />
-        <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mx-auto" />
-        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2 mx-auto" />
-      </div>
-    );
-
-  if (isError || !data)
-    return (
-      <div className="text-center p-4 text-red-500">
-        Failed to load profile.
-        {error && <div className="mt-1 text-xs text-red-400">{error.message}</div>}
-      </div>
-    );
+  if (!data) {
+    return <div className="p-4">Loading...</div>;
+  }
 
   const { fullName, email, about } = data;
   const { firstName, lastName } = splitName(fullName);
 
   return (
     <div className="space-y-4">
-      <LoginModal open={isLoginOpen} onOpenChange={setIsLoginOpen} />
+      <LoginModal
+        open={isLoginOpen}
+        onOpenChange={setIsLoginOpen}
+      />
 
-      <div className="relative w-[260px] h-[260px] mx-auto lg:mx-0">
-        <img
-          src={avatarUrl}
-          alt="Profile"
-          className="w-full h-full rounded-full border border-gray-300 dark:border-gray-600 object-cover"
-        />
-
-        {isEditMode && (
-          <button
-            onClick={handleAvatarClick}
-            className="absolute bottom-2 right-2 flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-            disabled={isUploading}
-          >
-            <Pencil className="w-4 h-4" />
-            {isUploading ? "Uploading..." : "Edit"}
-          </button>
-        )}
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-          disabled={isUploading}
-        />
-      </div>
+      <ProfileAvatar
+        avatarUrl={avatarUrl}
+        isEditMode={isEditMode}
+        onAvatarClick={handleAvatarClick}
+        isUploading={isUploading}
+      />
 
       <div className="flex gap-2 text-2xl">
         <EditableField
@@ -235,6 +193,7 @@ export default function SidebarProfile() {
           isEditMode={isEditMode}
           onChange={(val) => handleChange("firstName", val)}
         />
+
         <EditableField
           value={isEditMode ? localData.lastName : lastName}
           isEditMode={isEditMode}
@@ -245,12 +204,18 @@ export default function SidebarProfile() {
       {isEditMode ? (
         <textarea
           value={localData.about}
-          onChange={(e) => handleChange("about", e.target.value)}
+          onChange={(e) =>
+            handleChange("about", e.target.value)
+          }
           className="w-full border rounded px-2 py-1"
           rows={4}
         />
       ) : (
-        about && <p className="text-base text-gray-700 dark:text-gray-200">{about}</p>
+        about && (
+          <p className="text-base text-gray-700 dark:text-gray-200">
+            {about}
+          </p>
+        )
       )}
 
       {isEditMode ? (
@@ -262,6 +227,7 @@ export default function SidebarProfile() {
           >
             {isSaving ? "Saving..." : "Save"}
           </button>
+
           <button
             onClick={handleCancel}
             className="px-3 py-1.5 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 transition"
@@ -278,10 +244,7 @@ export default function SidebarProfile() {
         </button>
       )}
 
-      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-        <Users className="w-4 h-4" />
-        <span className="font-semibold text-gray-900 dark:text-gray-100">{views}</span> People View Your Portfolio
-      </div>
+      <ProfileViews count={views} />
 
       <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
         <SocialLink
@@ -289,9 +252,24 @@ export default function SidebarProfile() {
           url="https://www.linkedin.com/in/john-anthony-morales-a401b4276/"
           label="in/john-anthony-morales-a401b4276"
         />
-        <SocialLink icon={Github} url="https://github.com/JAnMorss" label="github.com/JAnMorss" />
+
+        <SocialLink
+          icon={Github}
+          url="https://github.com/JAnMorss"
+          label="github.com/JAnMorss"
+        />
+
         <SocialLink icon={Mail} label={email} />
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+        disabled={isUploading}
+      />
     </div>
   );
 }
