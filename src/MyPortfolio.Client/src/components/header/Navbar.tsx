@@ -25,8 +25,8 @@ export default function Navbar() {
 
   const navItems = [
     { path: "/overview", label: "Overview", icon: Home },
-    { path: "/skills", label: "Skills", icon: Award},
     { path: "/projects", label: "Projects", icon: FolderKanban },
+    { path: "/skills", label: "Skills", icon: Award},
     { path: "/education", label: "Education", icon: GraduationCap },
     { path: "/experience", label: "Experience", icon: Briefcase },
     { path: "/messages", label: "Messages", icon: MessageSquare, auth: true },
