@@ -5,7 +5,6 @@ import type { ProjectItem } from "@/schemas/projects/project.schema";
 import type { SkillItem } from "@/schemas/skills/skill.schema";
 import CustomizePinsModal from "@/components/modals/CustomizePinsModal";
 import CustomizeSkillPinsModal from "@/components/modals/CustomizeSkillPinsModal";
-import SkillsSection from "@/components/overview/SkillsSection";
 import PinnedProjects from "@/components/overview/PinnedProjects";
 import PinnedSkills from "@/components/overview/PinnedSkills";
 import Contact from "@/components/overview/Contact";
