@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyPortfolio.Application.Abstractions;
 using MyPortfolio.Application.Abstractions.BlobStorage;
+using MyPortfolio.Application.Abstractions.Realtime;
 using MyPortfolio.Domain.Educations.Interface;
 using MyPortfolio.Domain.Experiences.Interface;
 using MyPortfolio.Domain.Messages.Interface;
@@ -14,6 +15,7 @@ using MyPortfolio.Domain.Users.Interface;
 using MyPortfolio.Infrastructure.Authentication;
 using MyPortfolio.Infrastructure.Authentication.Extensions;
 using MyPortfolio.Infrastructure.BlobStorage;
+using MyPortfolio.Infrastructure.Realtime;
 using MyPortfolio.Infrastructure.Repositories;
 
 namespace MyPortfolio.Infrastructure;
@@ -57,6 +59,7 @@ public static class DependencyInjection
         services.AddScoped<ISkillRepository, SkillRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IProfileViewService, ProfileViewService>();
 
         services.AddSingleton(x => new BlobServiceClient(configuration.GetConnectionString("BlobStorage")));
         services.AddScoped<IBlobService, BlobService>();
