@@ -6,7 +6,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import type { ValidationError } from "@/schemas/ValidationError/validationError.schema";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 interface LoginFormProps {
   onLoginSuccess?: (message?: string) => void;
