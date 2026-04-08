@@ -36,7 +36,7 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-app.MapHub<ProfileHub>("/hubs/profile");
+app.MapHub<PortfolioHub>("/hubs/portfolio");
 
 using (var scope = app.Services.CreateScope())
 {
