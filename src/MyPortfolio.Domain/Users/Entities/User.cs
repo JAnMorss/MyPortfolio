@@ -69,9 +69,6 @@ public sealed class User : BaseEntity
     public IReadOnlyCollection<Skill> Skills
         => _skills.AsReadOnly();
 
-    private int _profileViews;
-    public int ProfileViews => _profileViews;
-
     public static Result<User> Create(
         FirstName firstName,
         LastName lastName,
@@ -221,10 +218,4 @@ public sealed class User : BaseEntity
 
     public void AssignRole(Role role) => _roles.Add(role);
 
-    public void IncrementProfileView()
-    {
-        _profileViews++;
-
-        RaiseDomainEvent(new UserProfileViewedDomainEvent(Id, _profileViews));
-    }
 }
