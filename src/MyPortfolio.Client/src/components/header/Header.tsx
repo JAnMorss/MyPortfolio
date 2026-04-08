@@ -1,11 +1,12 @@
 import { useState } from "react";
 import ThemeToggle from "../ThemeToggle";
-import Logo from "./Logo";
+import Logo from '../../assets/logo.png';
 import { Lock, Download } from "lucide-react"; 
 import { Button } from "../ui/button";
 import LoginModal from "../modals/login-modal";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/auth/useAuth";
 import Navbar from "./Navbar";
+
 
 export default function Header() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -15,7 +16,7 @@ export default function Header() {
     <header className="border-b border-[#d0d7de] dark:border-[#21262d] bg-[#f6f8fa] dark:bg-[#161b22]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Logo />
+          <img src={Logo} alt="Logo" className="w-12 h-12 bg-white rounded-full shadow-md" />
           <span className="text-base font-semibold">JAnMors</span>
         </div>
 
