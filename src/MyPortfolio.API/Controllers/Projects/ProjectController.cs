@@ -7,6 +7,7 @@ using MyPortfolio.API.Controllers.Projects.Requests;
 using MyPortfolio.Application.Abstractions.PageSize;
 using MyPortfolio.Application.Projects.Commands.CreateProject;
 using MyPortfolio.Application.Projects.Commands.DeleteProject;
+using MyPortfolio.Application.Projects.Commands.RemoveProjectMedia;
 using MyPortfolio.Application.Projects.Commands.UpdateProject;
 using MyPortfolio.Application.Projects.Commands.UploadProjectMedia;
 using MyPortfolio.Application.Projects.Queries.GetAllProjects;
@@ -128,12 +129,12 @@ public class ProjectController : ApiController
     }
 
     [AllowAnonymous]
-    [HttpGet("media/{id:guid}")]
+    [HttpGet("{projectId:guid}/media")]
     public async Task<IActionResult> GetProjectMedia(
-        [FromRoute] Guid id,
+        [FromRoute] Guid projectId,
         CancellationToken cancellationToken)
     {
-        var query = new GetProjectMediaQuery(id);
+        var query = new GetProjectMediaQuery(projectId);
 
         var result = await _sender.Send(query, cancellationToken);
 
@@ -144,18 +145,33 @@ public class ProjectController : ApiController
             : HandleFailure(result);
     }
 
-    [HttpPut("{id:guid}/media")]
+    [HttpPost("{projectId:guid}/media")]
     public async Task<IActionResult> UploadProjectMedia(
-        [FromRoute] Guid id,
-        IFormFile file,
+        [FromRoute] Guid projectId,
+        [FromForm] List<IFormFile> files,
         CancellationToken cancellationToken)
     {
-        var command = new UploadProjectMediaCommand(id, file);
+        var command = new UploadProjectMediaCommand(projectId, files);
 
         var result = await _sender.Send(command, cancellationToken);
 
         return result.IsSuccess
             ? Ok(new ApiResponse("Project media uploaded successfully."))
+            : HandleFailure(result);
+    }
+
+    [HttpDelete("{projectId:guid}/media")]
+    public async Task<IActionResult> RemoveProjectMedia(
+        [FromRoute] Guid projectId,
+        [FromQuery] string mediaUrl,
+        CancellationToken cancellationToken)
+    {
+        var command = new RemoveProjectMediaCommand(projectId, mediaUrl);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(new ApiResponse("Project media deleted successfully."))
             : HandleFailure(result);
     }
 }
