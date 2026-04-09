@@ -13,12 +13,18 @@ internal sealed class UploadProjectMediaCommandValidator
             .Must(id => id != Guid.Empty)
             .WithMessage("Invalid Project ID.");
 
-        RuleFor(x => x.File)
-            .NotNull().WithMessage("File must be provided.")
-            .Must(f => f!.Length > 0)
-            .WithMessage("File cannot be empty.")
-            .Must(f => IsSupportedFileType(f))
-            .WithMessage("Unsupported file type. Allowed types: jpg, png, gif, mp4.");
+        RuleFor(x => x.Files)
+            .NotEmpty().WithMessage("At least one file must be provided.");
+
+        RuleForEach(x => x.Files).ChildRules(files =>
+        {
+            files.RuleFor(f => f)
+                .NotNull().WithMessage("File must be provided.")
+                .Must(f => f!.Length > 0)
+                .WithMessage("File cannot be empty.")
+                .Must(f => IsSupportedFileType(f))
+                .WithMessage("Unsupported file type. Allowed types: jpg, jpeg, png, gif, mp4.");
+        });
     }
 
     private bool IsSupportedFileType(IFormFile file)
