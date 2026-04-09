@@ -4,22 +4,15 @@ namespace MyPortfolio.Application.Projects.Responses;
 
 public sealed class ProjectMediaResponse
 {
-    public string? MediaUrl { get; init; } = string.Empty;
+    public List<string> MediaUrls { get; init; } = new();
 
-    public byte[]? ImageBytes { get; init; }
-
-    public string? ContentType { get; init; }
-
-    public static ProjectMediaResponse FromEntity(
-        Project project,
-        byte[]? imageBytes = null,
-        string? contentType = null)
+    public static ProjectMediaResponse FromEntity(Project project)
     {
         return new ProjectMediaResponse
         {
-            MediaUrl = project.MediaUrl?.Value,
-            ImageBytes = imageBytes,
-            ContentType = contentType
+            MediaUrls = project.Media
+                .Select(m => m.Value)
+                .ToList()
         };
     }
 }
