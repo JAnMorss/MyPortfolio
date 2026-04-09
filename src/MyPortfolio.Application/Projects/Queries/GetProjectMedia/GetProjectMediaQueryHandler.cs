@@ -25,40 +25,19 @@ public sealed class GetProjectMediaQueryHandler
     }
 
     public async Task<Result<ProjectMediaResponse>> Handle(
-        GetProjectMediaQuery request, 
-        CancellationToken cancellationToken)
-    {
-        var project = await _projectRepository.GetByIdAsync(request.ProjectId, cancellationToken);
-        if (project is null) 
-            return Result.Failure<ProjectMediaResponse>(ProjectErrors.NotFound);
+    GetProjectMediaQuery request, 
+    CancellationToken cancellationToken)
+{
+    var project = await _projectRepository.GetByIdAsync(request.ProjectId, cancellationToken);
 
-        if (project.MediaUrl is null || string.IsNullOrWhiteSpace(project.MediaUrl.Value))
-            return Result.Failure<ProjectMediaResponse>(ProjectErrors.MediaNotFound);
+    if (project is null)
+        return Result.Failure<ProjectMediaResponse>(ProjectErrors.NotFound);
 
-        var fileId = Photo.ExtractFileIdFromUrl(project.MediaUrl.Value);
-        if (!fileId.HasValue)
-            return Result.Failure<ProjectMediaResponse>(ProjectErrors.InvalidMedia);
+    if (!project.Media.Any())
+        return Result.Failure<ProjectMediaResponse>(ProjectErrors.MediaNotFound);
 
-        var downloadResult = await _blobService.DownloadAsync(
-            MediaContainer,
-            fileId.Value,
-            cancellationToken
-        );
+    var response = ProjectMediaResponse.FromEntity(project);
 
-        if (downloadResult is null)
-            return Result.Failure<ProjectMediaResponse>(ProjectErrors.MediaNotFound);
-
-        using var memoryStream = new MemoryStream();
-        await downloadResult.Stream.CopyToAsync(memoryStream, cancellationToken);
-
-        var bytes = memoryStream.ToArray();
-
-        var response = ProjectMediaResponse.FromEntity(
-            project,
-            bytes,
-            downloadResult.ContentType
-        );
-
-        return Result.Success(response);
-    }
+    return Result.Success(response);
+}
 }
