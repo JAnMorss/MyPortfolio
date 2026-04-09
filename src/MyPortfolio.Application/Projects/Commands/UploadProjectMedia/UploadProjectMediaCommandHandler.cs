@@ -37,33 +37,36 @@ public sealed class UploadProjectMediaCommandHandler
             if (project is null)
                 return Result.Failure(ProjectErrors.NotFound);
 
-            if (project.MediaUrl is not null)
+            var uploadedUrls = new List<string>();
+
+            foreach (var file in request.Files)
             {
-                var existingFileId = Photo.ExtractFileIdFromUrl(project.MediaUrl.Value);
-                if (existingFileId.HasValue)
+                if (!file.ContentType.StartsWith("image/") &&
+                    !file.ContentType.StartsWith("video/"))
                 {
-                    await _blobService.DeleteAsync(Container, existingFileId.Value, cancellationToken);
+                    return Result.Failure(ProjectErrors.InvalidFile);
                 }
+
+                using var stream = file.OpenReadStream();
+
+                var contentType = string.IsNullOrEmpty(file.ContentType)
+                    ? "application/octet-stream"
+                    : file.ContentType;
+
+                var fileId = await _blobService.UploadAsync(
+                    Container,
+                    stream,
+                    contentType,
+                    cancellationToken
+                );
+
+                var url = _blobService.GetBlobUri(Container, fileId);
+                uploadedUrls.Add(url);
             }
 
-            using var stream = request.File.OpenReadStream();
-
-            var contentType = string.IsNullOrEmpty(request.File.ContentType)
-                ? "application/octet-stream"
-                : request.File.ContentType;
-
-            var newFileId = await _blobService.UploadAsync(
-                Container,
-                stream,
-                contentType,
-                cancellationToken
-            );
-
-            var newMediaUrl = _blobService.GetBlobUri(Container, newFileId);
-
-            var mediaResult = project.UpdateMedia(newMediaUrl);
-            if (mediaResult.IsFailure)
-                return Result.Failure(mediaResult.Error);
+            var result = project.AddMedia(uploadedUrls);
+            if (result.IsFailure)
+                return Result.Failure(result.Error);
 
             await _projectRepository.UpdateAsync(project, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
