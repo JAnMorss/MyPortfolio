@@ -9,22 +9,20 @@ namespace MyPortfolio.Domain.Projects.Entities;
 
 public sealed class Project : BaseEntity
 {
+    private readonly List<Photo> _media = new();
     private Project() { }
-
     public Project(
         Guid id,
         Title title,
         Description? description,
         Techstack techstack,
         Link? link,
-        Photo? mediaUrl, 
         Guid userId) : base(id)
     {
         Title = title;
         Description = description;
         Techstack = techstack;
         Link = link;
-        MediaUrl = mediaUrl;
         UserId = userId;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = null;
@@ -34,12 +32,13 @@ public sealed class Project : BaseEntity
     public Description? Description { get; private set; }
     public Techstack Techstack { get; private set; } = null!;
     public Link? Link { get; private set; }
-    public Photo? MediaUrl { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
+
+    public IReadOnlyCollection<Photo> Media => _media.AsReadOnly();
 
     public Result Update(
         string title,
@@ -98,17 +97,32 @@ public sealed class Project : BaseEntity
         return Result.Success(this);
     }
 
-    public Result UpdateMedia(string mediaUrl)
+    public Result AddMedia(IEnumerable<string> mediaUrls)
     {
-        var photoResult = Photo.Create(mediaUrl);
-        if (photoResult.IsFailure)
-            return Result.Failure(photoResult.Error);
+        foreach (var url in mediaUrls)
+        {
+            var result = Photo.Create(url);
+            if (result.IsFailure)
+                return Result.Failure(result.Error);
 
-        MediaUrl = photoResult.Value;
+            _media.Add(result.Value);
+        }
+
         UpdatedAt = DateTime.UtcNow;
+        RaiseDomainEvent(new AddMediaDomainEvent(Id));
 
-        RaiseDomainEvent(new MediaUpdatedDomainEvent(Id));
+        return Result.Success();
+    }
 
+    public Result RemoveMedia(string url)
+    {
+        var media = _media.FirstOrDefault(x => x.Value == url);
+        if (media is null)
+            return Result.Failure(new Error("Media.NotFound", "Media not found"));
+
+        _media.Remove(media);
+
+        UpdatedAt = DateTime.UtcNow;
         return Result.Success();
     }
 
