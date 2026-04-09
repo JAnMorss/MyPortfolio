@@ -1,42 +1,44 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef } from "react";
 import { projectApiConnector } from "@/api.connector/project/project.api.connector";
+import type { ProjectMediaData } from "@/schemas/projects/project.schema";
 import { useAuth } from "@/hooks/auth/useAuth";
 
-interface Props {
+type ProjectMediaModalProps = {
   projectId: string;
   onClose: () => void;
-}
+};
 
-export default function ProjectMediaModal({ projectId, onClose }: Props) {
+export default function ProjectMediaModal({
+  projectId,
+  onClose,
+}: ProjectMediaModalProps) {
   const { isAuthenticated } = useAuth();
-
-  const [imageSrc, setImageSrc] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [zoomed, setZoomed] = useState(false);
-
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const fetchMedia = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      const media = await projectApiConnector.getProjectMedia(projectId);
-      const src = `data:${media.contentType};base64,${media.imageBytes}`;
-      setImageSrc(src);
+      const data: ProjectMediaData = await projectApiConnector.getProjectMedia(projectId);
+
+      // Fix local URL for browser
+      const fixedUrls = (data.mediaUrls ?? []).map((url) =>
+        url.replace("portfolio-blob-storage", "localhost")
+      );
+
+      setMediaUrls(fixedUrls);
     } catch (err) {
       console.error("Failed to load media", err);
-      setImageSrc("");
+      setError("Failed to load media.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -44,92 +46,96 @@ export default function ProjectMediaModal({ projectId, onClose }: Props) {
     fetchMedia();
   }, [projectId]);
 
-  const handleUploadClick = () => {
-    if (!isAuthenticated) return;
-    fileInputRef.current?.click();
-  };
-
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
     try {
-      await projectApiConnector.updateProjectMedia(projectId, file);
-      await fetchMedia();
+      setIsUploading(true);
+      await projectApiConnector.addProjectMedia(projectId, file);
+      await fetchMedia(); // Refresh media list
     } catch (err) {
-      console.error("Upload failed", err);
+      console.error(err);
+      setError("Failed to upload media.");
     } finally {
-      setUploading(false);
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteMedia = async (url: string) => {
+    if (!confirm("Are you sure you want to delete this media?")) return;
+
+    try {
+      setIsLoading(true);
+      await projectApiConnector.deleteProjectMedia(projectId, [url]);
+      await fetchMedia(); // Refresh media list
+    } catch (err) {
+      console.error(err);
+      setError("Failed to delete media.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl p-0 overflow-hidden">
-        <DialogHeader className="px-6 py-4 border-b bg-gray-50 dark:bg-gray-800">
-          <DialogTitle className="text-lg font-semibold">
-            Project Media
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            Upload or update your project preview image
-          </DialogDescription>
-        </DialogHeader>
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 w-[90%] max-w-3xl relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+        >
+          ✖
+        </button>
 
-        <div className="p-6 flex flex-col items-center gap-4">
-          {loading ? (
-            <p className="text-center text-gray-500">Loading...</p>
-          ) : imageSrc ? (
-            <img
-              src={imageSrc}
-              alt="Project Media"
-              className="w-full max-w-md rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setZoomed(true)}
+        <h2 className="text-xl font-semibold mb-4">Project Media</h2>
+
+        {isAuthenticated && (
+          <div className="mb-4">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+              disabled={isUploading}
             />
-          ) : (
-            <p className="text-center text-muted-foreground">
-              No media available.
-            </p>
-          )}
-
-          {isAuthenticated && (
-            <div className="flex w-full justify-between items-center mt-2">
-              <p className="text-xs text-muted-foreground">
-                Recommended: PNG or JPG, max 5MB
-              </p>
-
-              <Button
-                variant="secondary"
-                onClick={handleUploadClick}
-                disabled={uploading}
-              >
-                {uploading ? "Uploading..." : "Upload Image"}
-              </Button>
-            </div>
-          )}
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </div>
-
-        {zoomed && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 cursor-zoom-out"
-            onClick={() => setZoomed(false)}
-          >
-            <img
-              src={imageSrc}
-              alt="Zoomed Project Media"
-              className="max-h-full max-w-full rounded-lg shadow-xl animate-fadeIn"
-            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              disabled={isUploading}
+            >
+              {isUploading ? "Uploading..." : "Add Media"}
+            </button>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+
+        {isLoading && <p>Loading media...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        {!isLoading && mediaUrls.length === 0 && !error && <p>No media available.</p>}
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {mediaUrls.map((url, idx) => (
+            <div key={idx} className="relative">
+              <img
+                src={url}
+                alt={`Media ${idx + 1}`}
+                className="w-full h-40 object-cover rounded-md border border-gray-300 dark:border-gray-600"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder.png";
+                }}
+              />
+              {isAuthenticated && (
+                <button
+                  onClick={() => handleDeleteMedia(url)}
+                  className="absolute top-1 right-1 bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
