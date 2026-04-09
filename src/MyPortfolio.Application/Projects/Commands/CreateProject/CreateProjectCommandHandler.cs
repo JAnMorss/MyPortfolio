@@ -59,7 +59,6 @@ public sealed class CreateProjectCommandHandler
             descriptionResult.Value,
             techstackResult.Value,
             linkResult.Value,
-            null,
             user.Id
         );
 
