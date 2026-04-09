@@ -9,7 +9,8 @@ public sealed class ProjectResponse
     public string? Description { get; set; }
     public string Techstack { get; set; } = null!;
     public string? Link { get; set; }
-    public string? MediaUrl { get; set; }
+    public List<string> MediaUrls { get; set; } = new();
+
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public Guid UserId { get; set; }
@@ -23,11 +24,12 @@ public sealed class ProjectResponse
             Description = project.Description?.Value,
             Techstack = project.Techstack?.Value ?? string.Empty,
             Link = project.Link?.Value,
-            MediaUrl = project.MediaUrl?.Value,
+            MediaUrls = project.Media
+                .Select(m => m.Value)
+                .ToList(),
             CreatedAt = project.CreatedAt,
             UpdatedAt = project.UpdatedAt,
             UserId = project.UserId,
         };
-
     }
 }
