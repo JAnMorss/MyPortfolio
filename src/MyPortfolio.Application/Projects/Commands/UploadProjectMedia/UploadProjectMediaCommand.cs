@@ -5,5 +5,5 @@ namespace MyPortfolio.Application.Projects.Commands.UploadProjectMedia;
 
 public sealed record UploadProjectMediaCommand(
     Guid ProjectId,
-    IFormFile File
+    IEnumerable<IFormFile> Files
 ) : ICommand;
