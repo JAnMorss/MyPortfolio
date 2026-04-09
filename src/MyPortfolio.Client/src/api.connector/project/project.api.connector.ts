@@ -5,7 +5,8 @@ import {
   type ProjectListData,
   type ProjectItem,
   type ProjectInput,
-  ProjectMediaSchema
+  ProjectMediaSchema,
+  type ProjectMediaData
 } from "@/schemas/projects/project.schema";
 
 import axios, {
@@ -91,26 +92,39 @@ export const projectApiConnector = {
     });
   },
 
-  getProjectMedia: async (id: string) => {
-    const response = await api.get(`/project/media/${id}`);
-
+  getProjectMedia: async (projectId: string): Promise<ProjectMediaData> => {
+    const response = await api.get(`/project/${projectId}/media`);
     const parsed = ProjectMediaSchema.parse(response.data);
-
     return parsed.data; 
   },
 
-  updateProjectMedia: async (id: string, file: File): Promise<void> => {
+  addProjectMedia: async (projectId: string, file: File): Promise<void> => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("Unauthorized");
 
     const formData = new FormData();
     formData.append("file", file);
 
-    await api.put(`/project/${id}/media`, formData, {
+    await api.post(`/project/${projectId}/media`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
       },
     });
   },
+
+  deleteProjectMedia: async (projectId: string, mediaUrls: string[]): Promise<void> => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Unauthorized");
+
+    await api.delete(`/project/${projectId}/media`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      data: { mediaUrls }, 
+    });
+  },
+
+  
 };
