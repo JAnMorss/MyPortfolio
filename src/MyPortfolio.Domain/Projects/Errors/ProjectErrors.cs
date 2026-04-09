@@ -15,4 +15,8 @@ public static class ProjectErrors
     public static readonly Error InvalidMedia = new(
         "Project.InvalidMedia",
         "The media URL associated with the Project is invalid.");
+
+    public static readonly Error InvalidFile = new(
+        "Project.InvalidMedia",
+        "Only image or video allowed");
 }
