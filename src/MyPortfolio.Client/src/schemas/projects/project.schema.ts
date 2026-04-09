@@ -6,7 +6,7 @@ export const projectItemSchema = z.object({
   description: z.string(),
   techstack: z.string(),
   link: z.string().url(),
-  mediaUrl: z.string().url().nullable(),
+  mediaUrls: z.array(z.string().url()).nullable(), 
   createdAt: z.string(), 
   updatedAt: z.string().nullable(),
   userId: z.string().uuid(),
@@ -23,25 +23,21 @@ export const projectListSchema = z.object({
 });
 
 export const ProjectInputSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  techstack: z.string().min(1, "Techstack is required"),
-  link: z.string().url("Must be a valid URL"),
+  title: z.string(),
+  description: z.string(),
+  techstack: z.string(),
+  link: z.string(),
 });
 
 export const ProjectMediaSchema = z.object({
   data: z.object({
-    mediaUrl: z.string().url(),
-    imageBytes: z.string(),
-    contentType: z.string(),
+    mediaUrls: z.array(z.string()),
   }),
-  message: z.string()
+  message: z.string(),
 });
 
 export type ProjectListResponse = z.infer<typeof projectListSchema>;
-
 export type ProjectItem = z.infer<typeof projectItemSchema>;
-
 export type ProjectListData = ProjectListResponse["data"];
-
 export type ProjectInput = z.infer<typeof ProjectInputSchema>;
+export type ProjectMediaData = z.infer<typeof ProjectMediaSchema>["data"];
