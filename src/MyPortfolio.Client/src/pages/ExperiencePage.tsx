@@ -8,10 +8,10 @@ import { experienceApiConnector } from "@/api.connector/experience/experience.ap
 
 import { Edit, Trash2, Briefcase } from "lucide-react";
 import ExperienceModal from "@/components/modals/ExperienceModal";
+import Pagination from "@/components/common/Pagination";
+import { useServerPagination } from "@/hooks/pagination/usePagination";
 
 export default function ExperiencePage() {
-  const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
-  const [filtered, setFiltered] = useState<ExperienceItem[]>([]);
   const [search, setSearch] = useState("");
 
   const [showModal, setShowModal] = useState(false);
@@ -19,42 +19,31 @@ export default function ExperiencePage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const {
+    data: experiences,
+    currentPage,
+    totalPages,
+    loading,
+    fetchData,
+    handlePageChange,
+    handleNext,
+    handlePrev,
+  } = useServerPagination(experienceApiConnector.getExperiences);
+
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
 
-  const fetchExperiences = async () => {
-    try {
-      const data = await experienceApiConnector.getExperiences();
-      setExperiences(data.items);
-      setFiltered(data.items);
-    } catch (error) {
-      console.error("Failed to fetch experiences", error);
-    }
-  };
-
   useEffect(() => {
-    fetchExperiences();
-  }, []);
-
-  useEffect(() => {
-    let result = experiences;
-
-    if (search) {
-      result = result.filter((e) =>
-        e.companyName.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    setFiltered(result);
-  }, [search, experiences]);
+    fetchData(1, search);
+  }, [search]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this experience?")) return;
 
     try {
       await experienceApiConnector.deleteExperience(id);
-      fetchExperiences();
+      fetchData(currentPage, search);
     } catch (error) {
       console.error("Delete failed", error);
     }
@@ -83,7 +72,7 @@ export default function ExperiencePage() {
       </div>
 
       <div className="space-y-4">
-        {filtered.map((exp) => (
+        {experiences.map((exp) => (
           <div
             key={exp.id}
             className="p-4 border border-[#d0d7de] dark:border-[#30363d] rounded-md 
@@ -144,12 +133,28 @@ export default function ExperiencePage() {
           </div>
         ))}
 
-        {filtered.length === 0 && (
+        {experiences.length === 0 && !loading && (
           <p className="text-center text-muted-foreground py-10">
             No experiences found.
           </p>
         )}
+
+        {loading && (
+          <p className="text-center text-muted-foreground py-10">
+            Loading...
+          </p>
+        )}
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onNext={() => handleNext(search)}
+          onPrev={() => handlePrev(search)}
+        />
+      )}
 
       {showModal && (
         <ExperienceModal
@@ -157,7 +162,7 @@ export default function ExperiencePage() {
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
-            fetchExperiences();
+            fetchData(currentPage, search);
           }}
         />
       )}
