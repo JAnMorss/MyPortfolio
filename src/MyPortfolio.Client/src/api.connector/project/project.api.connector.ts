@@ -45,8 +45,10 @@ api.interceptors.response.use(
 );
 
 export const projectApiConnector = {
-  getProjects: async (): Promise<ProjectListData> => {
-    const response = await api.get("/project");
+  getProjects: async (page: number = 1, pageSize: number = 10, search?: string): Promise<ProjectListData> => {
+    const params: any = { page, pageSize };
+    if (search) params.search = search;
+    const response = await api.get("/project", { params });
     return projectListSchema.parse(response.data).data;
   },
 
@@ -98,33 +100,27 @@ export const projectApiConnector = {
     return parsed.data; 
   },
 
-  addProjectMedia: async (projectId: string, file: File): Promise<void> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Unauthorized");
-
+  addProjectMedia: async (
+    projectId: string,
+    file: File
+  ): Promise<void> => {
     const formData = new FormData();
-    formData.append("file", file);
+
+    formData.append("files", file);
 
     await api.post(`/project/${projectId}/media`, formData, {
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
       },
     });
   },
 
-  deleteProjectMedia: async (projectId: string, mediaUrls: string[]): Promise<void> => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Unauthorized");
-
+  removeProjectMedia: async (
+    projectId: string,
+    mediaUrl: string
+  ): Promise<void> => {
     await api.delete(`/project/${projectId}/media`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      data: { mediaUrls }, 
+      params: { mediaUrl },
     });
   },
-
-  
 };
