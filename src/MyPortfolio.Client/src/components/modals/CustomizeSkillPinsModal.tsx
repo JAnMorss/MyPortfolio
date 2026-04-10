@@ -35,7 +35,7 @@ export default function CustomizeSkillPinsModal({
     if (selected.includes(id)) {
       setSelected(selected.filter((i) => i !== id));
     } else {
-      if (selected.length >= 6) return;
+      if (selected.length >= 8) return;
       setSelected([...selected, id]);
     }
   };
@@ -63,7 +63,7 @@ export default function CustomizeSkillPinsModal({
         />
 
         <p className="text-xs text-muted-foreground mt-2">
-          {6 - selected.length} remaining
+          {8 - selected.length} remaining
         </p>
 
         <div className="max-h-[300px] overflow-y-auto mt-2 space-y-2">
