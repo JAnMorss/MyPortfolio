@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import type { SkillItem } from "@/schemas/skills/skill.schema";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"; 
-
 import { skillApiConnector } from "@/api.connector/skill/skill.api.connector";
-
 import { Edit, Trash2 } from "lucide-react";
 import SkillModal from "@/components/modals/SkillModal";
 import { timeAgoPH } from "@/utils/timeAgo";
+import Pagination from "@/components/common/Pagination";
+import { LevelLabel } from "@/schemas/skills/skill.schema";
+import { useServerPagination } from "@/hooks/pagination/usePagination";
 
 const levelColorMap: Record<string, string> = {
   Beginner: "text-[#6f42c1]",    
@@ -18,8 +18,6 @@ const levelColorMap: Record<string, string> = {
 };
 
 export default function SkillsPage() {
-  const [skills, setSkills] = useState<SkillItem[]>([]);
-  const [filtered, setFiltered] = useState<SkillItem[]>([]);
   const [search, setSearch] = useState("");
 
   const [showModal, setShowModal] = useState(false);
@@ -27,39 +25,30 @@ export default function SkillsPage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const {
+    data: skills,
+    currentPage,
+    totalPages,
+    loading,
+    fetchData,
+    handlePageChange,
+    handleNext,
+    handlePrev,
+  } = useServerPagination(skillApiConnector.getSkills);
+
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
 
-  const fetchSkills = async () => {
-    try {
-      const data = await skillApiConnector.getSkills();
-      setSkills(data.items);
-      setFiltered(data.items);
-    } catch (error) {
-      console.error("Failed to fetch skills", error);
-    }
-  };
-
   useEffect(() => {
-    fetchSkills();
-  }, []);
-
-  useEffect(() => {
-    let result = skills;
-    if (search) {
-      result = result.filter((s) =>
-        s.skillName.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-    setFiltered(result);
-  }, [search, skills]);
+    fetchData(1, search);
+  }, [search]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this skill?")) return;
     try {
       await skillApiConnector.deleteSkill(id);
-      fetchSkills();
+      fetchData(currentPage, search);
     } catch (error) {
       console.error("Delete failed", error);
     }
@@ -88,7 +77,7 @@ export default function SkillsPage() {
       </div>
 
       <div className="divide-y">
-        {filtered.map((skill) => (
+        {skills.map((skill) => (
           <div
             key={skill.id}
             className="py-4 flex justify-between items-center hover:bg-muted/50 px-2 rounded"
@@ -99,10 +88,10 @@ export default function SkillsPage() {
                 <Badge
                   variant="outline"
                   className={`${
-                    levelColorMap[skill.level] ?? "text-gray-500"
+                    levelColorMap[LevelLabel[skill.level] || skill.level] ?? "text-gray-500"
                   } border-gray-300 dark:border-gray-600`}
                 >
-                  {skill.level}
+                  {LevelLabel[skill.level] || skill.level}
                 </Badge>
               </div>
 
@@ -137,12 +126,28 @@ export default function SkillsPage() {
           </div>
         ))}
 
-        {filtered.length === 0 && (
+        {skills.length === 0 && !loading && (
           <p className="text-center text-muted-foreground py-10">
             No skills found.
           </p>
         )}
+
+        {loading && (
+          <p className="text-center text-muted-foreground py-10">
+            Loading...
+          </p>
+        )}
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onNext={handleNext}
+          onPrev={handlePrev}
+        />
+      )}
 
       {showModal && (
         <SkillModal
@@ -150,7 +155,7 @@ export default function SkillsPage() {
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
-            fetchSkills();
+            fetchData(currentPage, search);
           }}
         />
       )}
