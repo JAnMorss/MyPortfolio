@@ -51,11 +51,13 @@ export const messageApiConnector = {
     await api.post("/message", validData);
   },
   
-  getMessages: async (): Promise<MessageListData> => {
+  getMessages: async (page: number = 1, pageSize: number = 10, search?: string): Promise<MessageListData> => {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("Unauthorized");
 
-    const response = await api.get("/message");
+    const params: any = { page, pageSize };
+    if (search) params.search = search;
+    const response = await api.get("/message", { params });
 
     return messageListSchema.parse(response.data).data;
   },
