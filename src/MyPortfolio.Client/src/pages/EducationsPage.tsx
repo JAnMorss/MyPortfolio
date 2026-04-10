@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import type { EducationItem } from "@/schemas/educations/education.schema";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 import { educationApiConnector } from "@/api.connector/education/education.api.connector";
-
 import { GraduationCap, Award, Edit, Trash2 } from "lucide-react";
 import EducationModal from "@/components/modals/EducationModal";
+import Pagination from "@/components/common/Pagination";
+import { useServerPagination } from "@/hooks/pagination/usePagination";
 
 export default function EducationsPage() {
-  const [educations, setEducations] = useState<EducationItem[]>([]);
-  const [filtered, setFiltered] = useState<EducationItem[]>([]);
   const [search, setSearch] = useState("");
 
   const [showModal, setShowModal] = useState(false);
@@ -19,42 +16,31 @@ export default function EducationsPage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const {
+    data: educations,
+    currentPage,
+    totalPages,
+    loading,
+    fetchData,
+    handlePageChange,
+    handleNext,
+    handlePrev,
+  } = useServerPagination(educationApiConnector.getEducations);
+
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
 
-  const fetchEducations = async () => {
-    try {
-      const data = await educationApiConnector.getEducations();
-      setEducations(data.items);
-      setFiltered(data.items);
-    } catch (error) {
-      console.error("Failed to fetch educations", error);
-    }
-  };
-
   useEffect(() => {
-    fetchEducations();
-  }, []);
-
-  useEffect(() => {
-    let result = educations;
-
-    if (search) {
-      result = result.filter((e) =>
-        e.school.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    setFiltered(result);
-  }, [search, educations]);
+    fetchData(1, search);
+  }, [search]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this education?")) return;
 
     try {
       await educationApiConnector.deleteEducation(id);
-      fetchEducations();
+      fetchData(currentPage, search);
     } catch (error) {
       console.error("Delete failed", error);
     }
@@ -83,7 +69,7 @@ export default function EducationsPage() {
       </div>
 
       <div className="space-y-4">
-        {filtered.map((edu) => (
+        {educations.map((edu) => (
           <div
             key={edu.id}
             className="p-4 border border-[#d0d7de] dark:border-[#30363d] rounded-md 
@@ -148,12 +134,28 @@ export default function EducationsPage() {
           </div>
         ))}
 
-        {filtered.length === 0 && (
+        {educations.length === 0 && !loading && (
           <p className="text-center text-muted-foreground py-10">
             No education found.
           </p>
         )}
+
+        {loading && (
+          <p className="text-center text-muted-foreground py-10">
+            Loading...
+          </p>
+        )}
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onNext={() => handleNext(search)}
+          onPrev={() => handlePrev(search)}
+        />
+      )}
 
       <div className="mt-8">
         <h3 className="text-base font-semibold mb-4 text-[#24292f] dark:text-[#c9d1d9] flex items-center gap-2">
@@ -172,7 +174,7 @@ export default function EducationsPage() {
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
-            fetchEducations();
+            fetchData(currentPage, search);
           }}
         />
       )}
