@@ -1,6 +1,5 @@
 import { useState } from "react";
-import type { SkillItem } from "@/schemas/skills/skill.schema";
-import { LevelLabel } from "@/schemas/skills/skill.schema";
+import type { SkillItem } from "@/schemas/skills/skill.schema"
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/modals/login-modal";
 
