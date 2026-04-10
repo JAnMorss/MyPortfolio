@@ -43,8 +43,10 @@ api.interceptors.response.use(
 );
 
 export const experienceApiConnector = {
-  getExperiences: async (): Promise<ExperienceListData> => {
-    const response = await api.get("/experience");
+  getExperiences: async (page: number = 1, pageSize: number = 10, search?: string): Promise<ExperienceListData> => {
+    const params: any = { page, pageSize };
+    if (search) params.search = search;
+    const response = await api.get("/experience", { params });
     return experienceListSchema.parse(response.data).data;
   },
 
