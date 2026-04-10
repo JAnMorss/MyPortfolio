@@ -9,63 +9,55 @@ import { BookOpen, Trash2, Edit, Image } from "lucide-react";
 import ProjectModal from "@/components/modals/ProjectModal";
 import ProjectMediaModal from "@/components/modals/ProjectMediaModal";
 import { timeAgoPH } from "@/utils/timeAgo";
+import Pagination from "@/components/common/Pagination";
+import { useServerPagination } from "@/hooks/pagination/usePagination";
 
 export default function ProjectPage() {
-  const [projects, setProjects] = useState<ProjectItem[]>([]);
-  const [filtered, setFiltered] = useState<ProjectItem[]>([]);
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("all");
 
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState<ProjectItem | null>(null);
 
-  // ✅ MEDIA MODAL STATE
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const {
+    data: projects,
+    currentPage,
+    totalPages,
+    loading,
+    fetchData,
+    handlePageChange,
+    handleNext,
+    handlePrev,
+  } = useServerPagination(projectApiConnector.getProjects);
+
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
 
-  const fetchProjects = async () => {
-    try {
-      const data = await projectApiConnector.getProjects();
-      setProjects(data.items);
-      setFiltered(data.items);
-    } catch (error) {
-      console.error("Failed to fetch projects", error);
-    }
-  };
-
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    fetchData(1, search);
+  }, [search]);
 
-  useEffect(() => {
-    let result = projects;
+  // Note: Language filter is client-side on current page data
+  // For full functionality, consider adding language param to API
 
-    if (search) {
-      result = result.filter((p) =>
-        p.title.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
+  const filteredProjects = projects.filter((p) => {
     if (language !== "all") {
-      result = result.filter((p) =>
-        p.techstack.toLowerCase().includes(language.toLowerCase())
-      );
+      return p.techstack.toLowerCase().includes(language.toLowerCase());
     }
-
-    setFiltered(result);
-  }, [search, language, projects]);
+    return true;
+  });
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this project?")) return;
     try {
       await projectApiConnector.deleteProject(id);
-      fetchProjects();
+      fetchData(currentPage, search);
     } catch (error) {
       console.error("Failed to delete project", error);
     }
@@ -104,7 +96,7 @@ export default function ProjectPage() {
       </div>
 
       <div className="divide-y">
-        {filtered.map((project) => (
+        {filteredProjects.map((project) => (
           <div key={project.id} className="py-5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded px-3">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
@@ -128,7 +120,7 @@ export default function ProjectPage() {
                   }}
                 >
                   <Image className="w-4 h-4 mr-1" />
-                  Preview
+                  View Gallery
                 </Button>
 
                 {isLoggedIn && (
@@ -176,13 +168,23 @@ export default function ProjectPage() {
         ))}
       </div>
 
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onNext={() => handleNext(search)}
+          onPrev={() => handlePrev(search)}
+        />
+      )}
+
       {showModal && (
         <ProjectModal
           project={modalProject ?? undefined}
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
-            fetchProjects();
+            fetchData(currentPage, search);
           }}
         />
       )}
