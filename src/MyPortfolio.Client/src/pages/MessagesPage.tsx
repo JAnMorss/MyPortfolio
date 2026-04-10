@@ -8,52 +8,40 @@ import { Button } from "@/components/ui/button";
 
 import { Trash2 } from "lucide-react";
 import { timeAgoPH } from "@/utils/timeAgo";
+import Pagination from "@/components/common/Pagination";
+import { useServerPagination } from "@/hooks/pagination/usePagination";
 
 export default function MessagesPage() {
-  const [messages, setMessages] = useState<MessageItem[]>([]);
-  const [filtered, setFiltered] = useState<MessageItem[]>([]);
   const [search, setSearch] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const {
+    data: messages,
+    currentPage,
+    totalPages,
+    loading,
+    fetchData,
+    handlePageChange,
+    handleNext,
+    handlePrev,
+  } = useServerPagination(messageApiConnector.getMessages);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
 
-  const fetchMessages = async () => {
-    try {
-      const data = await messageApiConnector.getMessages();
-      setMessages(data.items);
-      setFiltered(data.items);
-    } catch (error) {
-      console.error("Failed to fetch messages", error);
-    }
-  };
-
   useEffect(() => {
-    if (isLoggedIn) fetchMessages();
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-    let result = messages;
-
-    if (search) {
-      result = result.filter(
-        (m) =>
-          m.personName.toLowerCase().includes(search.toLowerCase()) ||
-          m.email.toLowerCase().includes(search.toLowerCase()) ||
-          m.content.toLowerCase().includes(search.toLowerCase())
-      );
+    if (isLoggedIn) {
+      fetchData(1, search);
     }
-
-    setFiltered(result);
-  }, [search, messages]);
+  }, [isLoggedIn, search]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this message?")) return;
 
       try {
         await messageApiConnector.deleteMessage(id);
-        fetchMessages();
+        fetchData(currentPage, search);
       } catch (error) {
         console.error("Delete failed", error);
       }
@@ -83,7 +71,7 @@ export default function MessagesPage() {
       </div>
 
       <div className="border rounded-xl overflow-hidden">
-        {filtered.map((msg) => (
+        {messages.map((msg) => (
           <div
             key={msg.id}
             className="group flex gap-4 p-4 border-b last:border-none hover:bg-muted/40 hover:shadow-sm hover:-translate-y-[1px] transition-all"
@@ -138,7 +126,7 @@ export default function MessagesPage() {
           </div>
         ))}
 
-        {filtered.length === 0 && (
+        {messages.length === 0 && !loading && (
           <div className="text-center py-16 space-y-2">
             <p className="text-lg font-medium">No messages yet</p>
             <p className="text-sm text-muted-foreground">
@@ -146,7 +134,23 @@ export default function MessagesPage() {
             </p>
           </div>
         )}
+
+        {loading && (
+          <div className="text-center py-16 space-y-2">
+            <p className="text-lg font-medium">Loading...</p>
+          </div>
+        )}
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onNext={() => handleNext(search)}
+          onPrev={() => handlePrev(search)}
+        />
+      )}
     </div>
   );
 }
