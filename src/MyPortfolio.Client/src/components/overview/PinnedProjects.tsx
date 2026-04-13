@@ -4,12 +4,14 @@ import type { ProjectItem } from "@/schemas/projects/project.schema";
 import { timeAgoPH } from "@/utils/timeAgo";
 import { useState } from "react";
 import LoginModal from "@/components/modals/login-modal";
+import PinnedProjectsSkeleton from "../skeletons/PinnedProjectsSkeleton";
 
 interface PinnedProjectsProps {
   projects: ProjectItem[];
   pinnedIds: string[];
   isLoggedIn: boolean;
   onOpenModal: () => void;
+  loading?: boolean;
 }
 
 export default function PinnedProjects({
@@ -17,14 +19,9 @@ export default function PinnedProjects({
   pinnedIds,
   isLoggedIn,
   onOpenModal,
+  loading
 }: PinnedProjectsProps) {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
-  const getProjectById = (id: string) => projects.find((p) => p.id === id);
-
-  const pinnedProjects = pinnedIds
-    .map(getProjectById)
-    .filter((p): p is ProjectItem => !!p);
 
   const handlePinClick = () => {
     if (isLoggedIn) {
@@ -33,6 +30,15 @@ export default function PinnedProjects({
       setIsLoginOpen(true);
     }
   };
+
+  if (loading) {
+    return <PinnedProjectsSkeleton />;
+  }
+
+  const getProjectById = (id: string) => projects.find((p) => p.id === id);
+  const pinnedProjects = pinnedIds
+    .map(getProjectById)
+    .filter((p): p is ProjectItem => !!p);
 
   return (
     <div className="space-y-6">
