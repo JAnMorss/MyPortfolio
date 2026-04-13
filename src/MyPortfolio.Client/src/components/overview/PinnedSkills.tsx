@@ -2,12 +2,14 @@ import { useState } from "react";
 import type { SkillItem } from "@/schemas/skills/skill.schema"
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/modals/login-modal";
+import PinnedSkillsSkeleton from "../skeletons/PinnedSkillsSkeleton";
 
 interface PinnedSkillsProps {
   skills: SkillItem[];
   pinnedIds: string[];
   isLoggedIn: boolean;
   onOpenModal: () => void;
+  loading?: boolean;
 }
 
 const levelPercentage: Record<string, number> = {
@@ -27,14 +29,9 @@ export default function PinnedSkills({
   pinnedIds,
   isLoggedIn,
   onOpenModal,
+  loading,
 }: PinnedSkillsProps) {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
-  const getSkillById = (id: string) => skills.find((s) => s.id === id);
-
-  const pinnedSkills = pinnedIds
-    .map(getSkillById)
-    .filter((s): s is SkillItem => !!s);
 
   const handleCustomizeClick = () => {
     if (isLoggedIn) {
@@ -43,6 +40,15 @@ export default function PinnedSkills({
       setIsLoginOpen(true);
     }
   };
+
+  if (loading) {
+    return <PinnedSkillsSkeleton />;
+  }
+
+  const getSkillById = (id: string) => skills.find((s) => s.id === id);
+  const pinnedSkills = pinnedIds
+    .map(getSkillById)
+    .filter((s): s is SkillItem => !!s);
 
   return (
     <div className="space-y-6">
