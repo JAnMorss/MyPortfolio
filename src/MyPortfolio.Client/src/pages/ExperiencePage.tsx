@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import type { ExperienceItem } from "@/schemas/experience/experience.schema";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { experienceApiConnector } from "@/api.connector/experience/experience.api.connector";
-
 import { Edit, Trash2, Briefcase } from "lucide-react";
 import ExperienceModal from "@/components/modals/ExperienceModal";
 import Pagination from "@/components/common/Pagination";
 import { useServerPagination } from "@/hooks/pagination/usePagination";
+import ExperienceSkeleton from "@/components/skeletons/ExperienceSkeleton";
 
 export default function ExperiencePage() {
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("startDate");
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState<ExperienceItem | null>(null);
@@ -35,15 +35,19 @@ export default function ExperiencePage() {
   }, []);
 
   useEffect(() => {
-    fetchData(1, search);
-  }, [search]);
+    fetchData(1, search, sortBy);
+  }, [search, sortBy]);
+
+  if (loading) {
+    return <ExperienceSkeleton />;
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this experience?")) return;
 
     try {
       await experienceApiConnector.deleteExperience(id);
-      fetchData(currentPage, search);
+      fetchData(currentPage, search, sortBy);
     } catch (error) {
       console.error("Delete failed", error);
     }
@@ -59,16 +63,29 @@ export default function ExperiencePage() {
           className="max-w-md"
         />
 
-        {isLoggedIn && (
-          <Button
-            onClick={() => {
-              setSelected(null);
-              setShowModal(true);
-            }}
-          >
-            Add Experience
-          </Button>
-        )}
+        <div className="flex gap-2">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="startDate">Start Date</SelectItem>
+              <SelectItem value="companyName">Company</SelectItem>
+              <SelectItem value="createdAt">Created</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {isLoggedIn && (
+            <Button
+              onClick={() => {
+                setSelected(null);
+                setShowModal(true);
+              }}
+            >
+              Add Experience
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -139,11 +156,6 @@ export default function ExperiencePage() {
           </p>
         )}
 
-        {loading && (
-          <p className="text-center text-muted-foreground py-10">
-            Loading...
-          </p>
-        )}
       </div>
 
       {totalPages > 1 && (
@@ -151,8 +163,8 @@ export default function ExperiencePage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          onNext={() => handleNext(search)}
-          onPrev={() => handlePrev(search)}
+          onNext={() => handleNext(search, sortBy)}
+          onPrev={() => handlePrev(search, sortBy)}
         />
       )}
 
@@ -162,7 +174,7 @@ export default function ExperiencePage() {
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
-            fetchData(currentPage, search);
+            fetchData(currentPage, search, sortBy);
           }}
         />
       )}
