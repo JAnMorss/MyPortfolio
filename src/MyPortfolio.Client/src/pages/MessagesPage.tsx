@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import type { MessageItem } from "@/schemas/message/message.schema";
 
 import { messageApiConnector } from "@/api.connector/message/message.api.connector";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { Trash2 } from "lucide-react";
 import { timeAgoPH } from "@/utils/timeAgo";
 import Pagination from "@/components/common/Pagination";
 import { useServerPagination } from "@/hooks/pagination/usePagination";
+import MessagesSkeleton from "@/components/skeletons/MessagesSkeleton";
 
 export default function MessagesPage() {
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("sentAt");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const {
@@ -32,16 +34,16 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetchData(1, search);
+      fetchData(1, search, sortBy);
     }
-  }, [isLoggedIn, search]);
+  }, [isLoggedIn, search, sortBy]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this message?")) return;
 
       try {
         await messageApiConnector.deleteMessage(id);
-        fetchData(currentPage, search);
+        fetchData(currentPage, search, sortBy);
       } catch (error) {
         console.error("Delete failed", error);
       }
@@ -49,10 +51,14 @@ export default function MessagesPage() {
 
     if (!isLoggedIn) {
       return (
-        <div className="text-center py-20 text-muted-foreground">
-          You must be logged in to view messages.
-        </div>
-      );
+          <div className="text-center py-20 text-muted-foreground">
+            You must be logged in to view messages.
+          </div>
+        );
+    }
+
+    if (loading) {
+    return <MessagesSkeleton />;
   }
 
   return (
@@ -62,12 +68,24 @@ export default function MessagesPage() {
           Messages
         </h1>
 
-        <Input
-          placeholder="Search messages..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search messages..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-sm"
+          />
+
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sentAt">Sent At</SelectItem>
+              <SelectItem value="personName">Name</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="border rounded-xl overflow-hidden">
@@ -147,8 +165,8 @@ export default function MessagesPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          onNext={() => handleNext(search)}
-          onPrev={() => handlePrev(search)}
+          onNext={() => handleNext(search, sortBy)}
+          onPrev={() => handlePrev(search, sortBy)}
         />
       )}
     </div>
