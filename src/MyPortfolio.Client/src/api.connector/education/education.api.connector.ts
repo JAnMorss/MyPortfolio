@@ -43,9 +43,10 @@ api.interceptors.response.use(
 );
 
 export const educationApiConnector = {
-  getEducations: async (page: number = 1, pageSize: number = 10, search?: string): Promise<EducationListData> => {
+  getEducations: async (page: number = 1, pageSize: number = 10, search?: string, sortBy?: string): Promise<EducationListData> => {
     const params: any = { page, pageSize };
     if (search) params.search = search;
+    if (sortBy) params.sortBy = sortBy;
     const response = await api.get("/educations", { params });
     return educationListSchema.parse(response.data).data;
   },
