@@ -11,10 +11,12 @@ import ProjectMediaModal from "@/components/modals/ProjectMediaModal";
 import { timeAgoPH } from "@/utils/timeAgo";
 import Pagination from "@/components/common/Pagination";
 import { useServerPagination } from "@/hooks/pagination/usePagination";
+import ProjectsSkeleton from "@/components/skeletons/ProjectsSkeleton";
 
 export default function ProjectPage() {
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("all");
+  const [sortBy, setSortBy] = useState("createdAt");
 
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState<ProjectItem | null>(null);
@@ -40,11 +42,12 @@ export default function ProjectPage() {
   }, []);
 
   useEffect(() => {
-    fetchData(1, search);
-  }, [search]);
+    fetchData(1, search, sortBy);
+  }, [search, sortBy]);
 
-  // Note: Language filter is client-side on current page data
-  // For full functionality, consider adding language param to API
+  if (loading) {
+    return <ProjectsSkeleton />;
+  }
 
   const filteredProjects = projects.filter((p) => {
     if (language !== "all") {
@@ -57,7 +60,7 @@ export default function ProjectPage() {
     if (!confirm("Are you sure you want to delete this project?")) return;
     try {
       await projectApiConnector.deleteProject(id);
-      fetchData(currentPage, search);
+      fetchData(currentPage, search, sortBy);
     } catch (error) {
       console.error("Failed to delete project", error);
     }
@@ -87,6 +90,16 @@ export default function ProjectPage() {
             </SelectContent>
           </Select>
 
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="h-9 w-[140px] text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="createdAt">Created</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+            </SelectContent>
+          </Select>
+
           {isLoggedIn && (
             <Button onClick={() => { setModalProject(null); setShowModal(true); }}>
               Create Project
@@ -98,19 +111,37 @@ export default function ProjectPage() {
       <div className="divide-y">
         {filteredProjects.map((project) => (
           <div key={project.id} className="py-5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded px-3">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-muted-foreground" />
-                <a href={project.link || "#"} target="_blank" className="text-blue-600 font-semibold text-lg hover:underline">
-                  {project.title}
-                </a>
-                <span className="text-xs border rounded-full px-2 py-0.5 text-muted-foreground">
-                  Personal Project
-                </span>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <BookOpen className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <a href={project.link || "#"} target="_blank" className="text-blue-600 font-semibold text-lg hover:underline truncate">
+                    {project.title}
+                  </a>
+                  <span className="text-xs border rounded-full px-2 py-0.5 text-muted-foreground flex-shrink-0">
+                    Personal Project
+                  </span>
+                </div>
+
+                <p className="text-sm text-muted-foreground mb-2 max-w-2xl">
+                  {project.description}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {project.techstack.split(",").map((tech, index) => (
+                    <span key={index} className="px-3 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700">
+                      {tech.trim()}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex gap-4 text-xs text-muted-foreground">
+                  <span>Created: {timeAgoPH(project.createdAt)}</span>
+                  {project.updatedAt && <span>Updated: {timeAgoPH(project.updatedAt)}</span>}
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
-
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <Button
                   size="sm"
                   variant="outline"
@@ -147,23 +178,6 @@ export default function ProjectPage() {
                 )}
               </div>
             </div>
-
-            <p className="text-sm text-muted-foreground mt-1 mb-2 max-w-2xl">
-              {project.description}
-            </p>
-
-            <div className="flex flex-wrap gap-2 mb-2">
-              {project.techstack.split(",").map((tech, index) => (
-                <span key={index} className="px-3 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700">
-                  {tech.trim()}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex gap-4 text-xs text-muted-foreground">
-              <span>Created: {timeAgoPH(project.createdAt)}</span>
-              {project.updatedAt && <span>Updated: {timeAgoPH(project.updatedAt)}</span>}
-            </div>
           </div>
         ))}
       </div>
@@ -173,8 +187,8 @@ export default function ProjectPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          onNext={() => handleNext(search)}
-          onPrev={() => handlePrev(search)}
+          onNext={() => handleNext(search, sortBy)}
+          onPrev={() => handlePrev(search, sortBy)}
         />
       )}
 
@@ -184,7 +198,7 @@ export default function ProjectPage() {
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
-            fetchData(currentPage, search);
+            fetchData(currentPage, search, sortBy);
           }}
         />
       )}
