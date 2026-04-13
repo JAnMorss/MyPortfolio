@@ -187,17 +187,27 @@ export default function SidebarProfile() {
         isUploading={isUploading}
       />
 
-      <div className="flex gap-2 text-2xl">
-        <EditableField
-          value={isEditMode ? localData.firstName : firstName}
-          isEditMode={isEditMode}
-          onChange={(val) => handleChange("firstName", val)}
-        />
+      <div className="space-y-1">
+        <div className="flex gap-2 text-2xl">
+          <EditableField
+            value={isEditMode ? localData.firstName : firstName}
+            isEditMode={isEditMode}
+            onChange={(val) => handleChange("firstName", val)}
+          />
+
+          <EditableField
+            value={isEditMode ? localData.lastName : lastName}
+            isEditMode={isEditMode}
+            onChange={(val) => handleChange("lastName", val)}
+          />
+        </div>
 
         <EditableField
-          value={isEditMode ? localData.lastName : lastName}
+          value={isEditMode ? localData.headLine ?? "" : data.headLine || "Full Stack Developer"}
           isEditMode={isEditMode}
-          onChange={(val) => handleChange("lastName", val)}
+          onChange={(val) => handleChange("headLine", val)}
+          placeholder="Enter a headline"
+          className="text-xl font-light text-[#57606a] dark:text-[#8b949e]"
         />
       </div>
 
