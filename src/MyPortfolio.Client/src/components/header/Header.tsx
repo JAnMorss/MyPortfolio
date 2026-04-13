@@ -34,11 +34,11 @@ export default function Header() {
                 setIsLoginOpen(true);
               }
             }}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 "
             title={isAuthenticated ? "Logout" : "Admin login"}
           >
             <Lock className="w-4 h-4" />
-            {isAuthenticated ? "Logout" : "Admin"}
+            <span className="hidden sm:inline">{isAuthenticated ? "Logout" : "Admin"}</span>
           </Button>
 
           <a
@@ -49,7 +49,7 @@ export default function Header() {
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border border-[#d0d7de] dark:border-[#30363d] bg-transparent text-[#24292f] dark:text-[#c9d1d9] hover:bg-[#f6f8fa] dark:hover:bg-[#161b22] transition-colors"
           >
             <Download className="w-4 h-4" />
-            Download Resume
+            <span className="hidden sm:inline">Download Resume</span>
           </a>
           
         </div>
