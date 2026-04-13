@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import type { EducationItem } from "@/schemas/educations/education.schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { educationApiConnector } from "@/api.connector/education/education.api.connector";
 import { GraduationCap, Award, Edit, Trash2 } from "lucide-react";
 import EducationModal from "@/components/modals/EducationModal";
 import Pagination from "@/components/common/Pagination";
 import { useServerPagination } from "@/hooks/pagination/usePagination";
+import EducationsSkeleton from "@/components/skeletons/EducationsSkeleton";
 
 export default function EducationsPage() {
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("startDate");
 
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState<EducationItem | null>(null);
@@ -32,15 +35,19 @@ export default function EducationsPage() {
   }, []);
 
   useEffect(() => {
-    fetchData(1, search);
-  }, [search]);
+    fetchData(1, search, sortBy);
+  }, [search, sortBy]);
+
+  if (loading) {
+    return <EducationsSkeleton />;
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this education?")) return;
 
     try {
       await educationApiConnector.deleteEducation(id);
-      fetchData(currentPage, search);
+      fetchData(currentPage, search, sortBy);
     } catch (error) {
       console.error("Delete failed", error);
     }
@@ -56,16 +63,30 @@ export default function EducationsPage() {
           className="max-w-md"
         />
 
-        {isLoggedIn && (
-          <Button
-            onClick={() => {
-              setSelected(null);
-              setShowModal(true);
-            }}
-          >
-            Add Education
-          </Button>
-        )}
+        <div className="flex gap-2">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="startDate">Start Date</SelectItem>
+              <SelectItem value="school">School</SelectItem>
+              <SelectItem value="degree">Degree</SelectItem>
+              <SelectItem value="createdAt">Created</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {isLoggedIn && (
+            <Button
+              onClick={() => {
+                setSelected(null);
+                setShowModal(true);
+              }}
+            >
+              Add Education
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -140,11 +161,6 @@ export default function EducationsPage() {
           </p>
         )}
 
-        {loading && (
-          <p className="text-center text-muted-foreground py-10">
-            Loading...
-          </p>
-        )}
       </div>
 
       {totalPages > 1 && (
@@ -152,8 +168,8 @@ export default function EducationsPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          onNext={() => handleNext(search)}
-          onPrev={() => handlePrev(search)}
+          onNext={() => handleNext(search, sortBy)}
+          onPrev={() => handlePrev(search, sortBy)}
         />
       )}
 
@@ -174,7 +190,7 @@ export default function EducationsPage() {
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
-            fetchData(currentPage, search);
+            fetchData(currentPage, search, sortBy);
           }}
         />
       )}
