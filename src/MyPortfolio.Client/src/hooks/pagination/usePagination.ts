@@ -32,7 +32,7 @@ export function usePagination<T>(data: T[], pageSize: number = 10) {
 }
 
 export function useServerPagination<T>(
-  fetchFunction: (page: number, pageSize: number, search?: string) => Promise<{ items: T[]; totalCount: number; page: number; pageSize: number }>,
+  fetchFunction: (page: number, pageSize: number, search?: string, sortBy?: string) => Promise<{ items: T[]; totalCount: number; page: number; pageSize: number }>,
   pageSize: number = 10
 ) {
   const [data, setData] = useState<T[]>([]);
@@ -41,10 +41,10 @@ export function useServerPagination<T>(
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const fetchData = async (page: number = 1, search: string = "") => {
+  const fetchData = async (page: number = 1, search: string = "", sortBy?: string) => {
     setLoading(true);
     try {
-      const result = await fetchFunction(page, pageSize, search);
+      const result = await fetchFunction(page, pageSize, search, sortBy);
       setData(result.items);
       setTotalCount(result.totalCount);
       setTotalPages(Math.ceil(result.totalCount / pageSize));
@@ -56,20 +56,20 @@ export function useServerPagination<T>(
     }
   };
 
-  const handlePageChange = (page: number, search: string = "") => {
+  const handlePageChange = (page: number, search: string = "", sortBy?: string) => {
     setCurrentPage(page);
-    fetchData(page, search);
+    fetchData(page, search, sortBy);
   };
 
-  const handleNext = (search: string = "") => {
+  const handleNext = (search: string = "", sortBy?: string) => {
     if (currentPage < totalPages) {
-      handlePageChange(currentPage + 1, search);
+      handlePageChange(currentPage + 1, search, sortBy);
     }
   };
 
-  const handlePrev = (search: string = "") => {
+  const handlePrev = (search: string = "", sortBy?: string) => {
     if (currentPage > 1) {
-      handlePageChange(currentPage - 1, search);
+      handlePageChange(currentPage - 1, search, sortBy);
     }
   };
 
