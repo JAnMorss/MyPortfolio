@@ -45,9 +45,10 @@ api.interceptors.response.use(
 );
 
 export const projectApiConnector = {
-  getProjects: async (page: number = 1, pageSize: number = 10, search?: string): Promise<ProjectListData> => {
+  getProjects: async (page: number = 1, pageSize: number = 10, search?: string, sortBy?: string): Promise<ProjectListData> => {
     const params: any = { page, pageSize };
     if (search) params.search = search;
+    if (sortBy) params.sortBy = sortBy;
     const response = await api.get("/project", { params });
     return projectListSchema.parse(response.data).data;
   },
