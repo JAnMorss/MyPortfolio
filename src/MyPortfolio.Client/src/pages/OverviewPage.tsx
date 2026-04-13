@@ -8,6 +8,7 @@ import CustomizeSkillPinsModal from "@/components/modals/CustomizeSkillPinsModal
 import PinnedProjects from "@/components/overview/PinnedProjects";
 import PinnedSkills from "@/components/overview/PinnedSkills";
 import Contact from "@/components/overview/Contact";
+import OverviewHeroSection from "@/components/overview/OverviewHeroSection";
 
 export default function OverviewPage() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
@@ -23,6 +24,8 @@ export default function OverviewPage() {
   const [openModal, setOpenModal] = useState(false);
   const [openSkillModal, setOpenSkillModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadingSkills, setLoadingSkills] = useState(true);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
@@ -35,6 +38,8 @@ export default function OverviewPage() {
         setProjects(data.items);
       } catch (error) {
         console.error("Failed to fetch projects", error);
+      } finally {
+        setLoadingProjects(false); 
       }
     };
     fetch();
@@ -47,6 +52,8 @@ export default function OverviewPage() {
         setSkills(data.items);
       } catch (error) {
         console.error("Failed to fetch skills", error);
+      } finally {
+        setLoadingSkills(false);
       }
     };
     fetch();
@@ -62,21 +69,21 @@ export default function OverviewPage() {
 
   return (
     <div className="space-y-6">
-
-        <PinnedProjects
+      <OverviewHeroSection />
+      <PinnedProjects
             projects={projects}
             pinnedIds={pinnedIds}
             isLoggedIn={isLoggedIn}
             onOpenModal={() => setOpenModal(true)}
+            loading={loadingProjects}
         />
-
         <PinnedSkills
             skills={skills}
             pinnedIds={pinnedSkillIds}
             isLoggedIn={isLoggedIn}
             onOpenModal={() => setOpenSkillModal(true)}
+            loading={loadingSkills}
         />
-
         <Contact />
 
         {isLoggedIn && (
