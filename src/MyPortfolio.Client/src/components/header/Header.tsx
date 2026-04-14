@@ -7,7 +7,6 @@ import LoginModal from "../modals/login-modal";
 import { useAuth } from "@/hooks/auth/useAuth";
 import Navbar from "./Navbar";
 
-
 export default function Header() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
@@ -15,13 +14,31 @@ export default function Header() {
   return (
     <header className="border-b border-[#d0d7de] dark:border-[#21262d] bg-[#f6f8fa] dark:bg-[#161b22]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        
+        {/* LEFT */}
         <div className="flex items-center gap-3">
           <img src={Logo} alt="Logo" className="w-12 h-12 bg-white rounded-full shadow-md" />
           <span className="text-base font-semibold">JAnMors</span>
         </div>
 
+        {/* RIGHT */}
         <div className="flex items-center gap-3">
+          
           <ThemeToggle />
+
+          {/* 🔥 MODE INDICATOR (NEW) */}
+          <div className="hidden sm:flex">
+            <div
+              className={`text-xs px-3 py-1 rounded-full border backdrop-blur transition
+                ${
+                  isAuthenticated
+                    ? "bg-yellow-500/15 text-yellow-200 border-yellow-500/30"
+                    : "bg-green-500/15 text-green-200 border-green-500/30"
+                }`}
+            >
+              {isAuthenticated ? "🔐 Admin Mode" : "🟢 Public Mode"}
+            </div>
+          </div>
 
           <Button
             variant="outline"
@@ -34,11 +51,13 @@ export default function Header() {
                 setIsLoginOpen(true);
               }
             }}
-            className="flex items-center gap-1 "
+            className="flex items-center gap-1"
             title={isAuthenticated ? "Logout" : "Admin login"}
           >
             <Lock className="w-4 h-4" />
-            <span className="hidden sm:inline">{isAuthenticated ? "Logout" : "Admin"}</span>
+            <span className="hidden sm:inline">
+              {isAuthenticated ? "Logout" : "Admin"}
+            </span>
           </Button>
 
           <a
