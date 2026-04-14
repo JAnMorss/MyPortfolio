@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { ProjectItem } from "@/schemas/projects/project.schema";
-
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -78,7 +77,7 @@ export default function ProjectPage() {
 
         <div className="flex gap-2">
           <Select onValueChange={(val) => setLanguage(val)}>
-            <SelectTrigger className="h-9 w-[140px] text-sm">
+            <SelectTrigger className="h-9 w-35 text-sm">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent>
@@ -91,7 +90,7 @@ export default function ProjectPage() {
           </Select>
 
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="h-9 w-[140px] text-sm">
+            <SelectTrigger className="h-9 w-35 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -114,11 +113,11 @@ export default function ProjectPage() {
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <BookOpen className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <BookOpen className="w-4 h-4 text-muted-foreground shrink-0" />
                   <a href={project.link || "#"} target="_blank" className="text-blue-600 font-semibold text-lg hover:underline truncate">
                     {project.title}
                   </a>
-                  <span className="text-xs border rounded-full px-2 py-0.5 text-muted-foreground flex-shrink-0">
+                  <span className="text-xs border rounded-full px-2 py-0.5 text-muted-foreground shrink-0">
                     Personal Project
                   </span>
                 </div>
@@ -141,7 +140,7 @@ export default function ProjectPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 <Button
                   size="sm"
                   variant="outline"
