@@ -11,7 +11,7 @@ type ProfileAvatarProps = {
 
 export default function ProfileAvatar({ avatarUrl, isEditMode, onAvatarClick, isUploading }: ProfileAvatarProps) {
   return (
-    <div className="relative w-[260px] h-[260px] mx-auto lg:mx-0">
+    <div className="relative w-65 h-65 mx-auto lg:mx-0">
       <img
         src={avatarUrl}
         alt="Profile"
