@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import { Mail, Send, X } from "lucide-react";
-
 import { messageApiConnector } from "@/api.connector/message/message.api.connector";
 import {
   MessageInputSchema,
   type MessageInput,
 } from "@/schemas/message/message.schema";
 import type { ValidationError } from "@/schemas/ValidationError/validationError.schema";
-
 import ContactSkeleton from "@/components/skeletons/ContactSkeleton";
 
 export default function Contact() {
