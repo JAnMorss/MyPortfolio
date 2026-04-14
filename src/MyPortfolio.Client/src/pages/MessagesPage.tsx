@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
-
 import { messageApiConnector } from "@/api.connector/message/message.api.connector";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 import { Trash2 } from "lucide-react";
 import { timeAgoPH } from "@/utils/timeAgo";
 import Pagination from "@/components/common/Pagination";
@@ -77,7 +74,7 @@ export default function MessagesPage() {
           />
 
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-35">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -92,9 +89,9 @@ export default function MessagesPage() {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className="group flex gap-4 p-4 border-b last:border-none hover:bg-muted/40 hover:shadow-sm hover:-translate-y-[1px] transition-all"
+            className="group flex gap-4 p-4 border-b last:border-none hover:bg-muted/40 hover:shadow-sm hover:-translate-y-px transition-all"
           >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-sm font-medium">
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-sm font-medium">
               {msg.personName.charAt(0).toUpperCase()}
             </div>
 
