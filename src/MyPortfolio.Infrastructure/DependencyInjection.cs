@@ -59,7 +59,7 @@ public static class DependencyInjection
         services.AddScoped<ISkillRepository, SkillRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
-        services.AddScoped<IProfileViewService, ProfileViewService>();
+        services.AddSingleton<IProfileViewService, ProfileViewService>();
 
         services.AddSingleton(x => new BlobServiceClient(configuration.GetConnectionString("BlobStorage")));
         services.AddScoped<IBlobService, BlobService>();
