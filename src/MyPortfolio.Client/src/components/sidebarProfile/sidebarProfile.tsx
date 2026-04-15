@@ -7,20 +7,17 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Github, Linkedin, Mail } from "lucide-react";
-
 import {
   UpdateUserProfileSchema,
   type UserProfileData,
 } from "@/schemas/users/userProfile.schema";
 import { userApiConnector } from "@/api.connector/user/user.api.connector";
 import { useAuth } from "@/hooks/auth/useAuth";
-
 import LoginModal from "../modals/login-modal";
 import EditableField from "./EditableField";
 import SocialLink from "./SocialLink";
 import ProfileAvatar from "./ProfileAvatar";
 import ProfileViews from "./ProfileViews";
-
 import { connection } from "@/lib/signalr";
 
 const USER_ID = "4AB06C35-908E-4697-8A35-5E7546C292D2";
@@ -45,7 +42,6 @@ type LocalEditData = {
 export default function SidebarProfile() {
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
-
   const [isEditMode, setIsEditMode] = useState(false);
   const [localData, setLocalData] = useState<LocalEditData>({
     firstName: "",
@@ -53,7 +49,6 @@ export default function SidebarProfile() {
   });
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [views, setViews] = useState<number>(0);
-
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
