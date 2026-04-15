@@ -173,17 +173,6 @@ export default function EducationsPage() {
         />
       )}
 
-      <div className="mt-8">
-        <h3 className="text-base font-semibold mb-4 text-[#24292f] dark:text-[#c9d1d9] flex items-center gap-2">
-          <Award className="w-5 h-5" />
-          Certifications
-        </h3>
-
-        <div className="p-4 border border-dashed rounded-md text-sm text-muted-foreground text-center">
-          No certifications added yet.
-        </div>
-      </div>
-
       {showModal && (
         <EducationModal
           education={selected ?? undefined}
