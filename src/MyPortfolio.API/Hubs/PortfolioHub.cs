@@ -14,18 +14,14 @@ public class PortfolioHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var count = _viewService.Increment();
+        var isAuthenticated = Context.User?.Identity?.IsAuthenticated ?? false;
 
-        await Clients.All.SendAsync("ReceiveViewCount", count);
+        if (!isAuthenticated)
+        {
+            var count = _viewService.Increment();
+            await Clients.All.SendAsync("ReceiveViewCount", count);
+        }
 
         await base.OnConnectedAsync();
-    }
-
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        // var count = _viewService.Decrement();
-        // await Clients.All.SendAsync("ReceiveViewCount", count);
-
-        await base.OnDisconnectedAsync(exception);
     }
 }
