@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import type { SkillItem } from "@/schemas/skills/skill.schema";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 import {
   Select,
   SelectTrigger,
@@ -18,7 +15,6 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-
 import { skillApiConnector } from "@/api.connector/skill/skill.api.connector";
 import { SkillInputSchema } from "@/schemas/skills/skill.schema";
 import type { ValidationError } from "@/schemas/ValidationError/validationError.schema";
