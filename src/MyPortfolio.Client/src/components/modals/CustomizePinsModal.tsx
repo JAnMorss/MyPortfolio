@@ -65,7 +65,7 @@ export default function CustomizePinsModal({
           {7 - selected.length} remaining
         </p>
 
-        <div className="max-h-[300px] overflow-y-auto mt-2 space-y-2">
+        <div className="max-h-75 overflow-y-auto mt-2 space-y-2">
           {filtered.map((project) => (
             <div
               key={project.id}
