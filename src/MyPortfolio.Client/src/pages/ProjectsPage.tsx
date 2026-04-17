@@ -16,15 +16,11 @@ export default function ProjectPage() {
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("all");
   const [sortBy, setSortBy] = useState("createdAt");
-
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState<ProjectItem | null>(null);
-
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const {
     data: projects,
     currentPage,
