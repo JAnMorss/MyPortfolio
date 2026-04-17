@@ -2,9 +2,7 @@ import { useState, useMemo } from "react";
 
 export function usePagination<T>(data: T[], pageSize: number = 10) {
   const [currentPage, setCurrentPage] = useState(1);
-
   const totalPages = Math.ceil(data.length / pageSize);
-
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return data.slice(start, start + pageSize);
@@ -15,9 +13,7 @@ export function usePagination<T>(data: T[], pageSize: number = 10) {
 
   const prevPage = () =>
     setCurrentPage((p) => Math.max(p - 1, 1));
-
   const goToPage = (page: number) => setCurrentPage(page);
-
   const reset = () => setCurrentPage(1);
 
   return {
