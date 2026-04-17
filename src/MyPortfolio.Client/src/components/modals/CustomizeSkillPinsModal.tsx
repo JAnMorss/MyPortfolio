@@ -1,14 +1,12 @@
 import { useState } from "react";
 import type { SkillItem } from "@/schemas/skills/skill.schema";
 import { LevelLabel } from "@/schemas/skills/skill.schema";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -30,7 +28,6 @@ export default function CustomizeSkillPinsModal({
 }: Props) {
   const [selected, setSelected] = useState<string[]>(pinnedIds);
   const [search, setSearch] = useState("");
-
   const toggle = (id: string) => {
     if (selected.includes(id)) {
       setSelected(selected.filter((i) => i !== id));
@@ -39,7 +36,6 @@ export default function CustomizeSkillPinsModal({
       setSelected([...selected, id]);
     }
   };
-
   const filtered = skills.filter((s) =>
     s.skillName.toLowerCase().includes(search.toLowerCase())
   );
@@ -66,7 +62,7 @@ export default function CustomizeSkillPinsModal({
           {8 - selected.length} remaining
         </p>
 
-        <div className="max-h-[300px] overflow-y-auto mt-2 space-y-2">
+        <div className="max-h-75 overflow-y-auto mt-2 space-y-2">
           {filtered.map((skill) => (
             <div
               key={skill.id}
