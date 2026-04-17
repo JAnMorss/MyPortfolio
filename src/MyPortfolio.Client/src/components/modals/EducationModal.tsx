@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import type { EducationItem } from "@/schemas/educations/education.schema";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
 import { educationApiConnector } from "@/api.connector/education/education.api.connector";
 import { EducationInputSchema } from "@/schemas/educations/education.schema";
 import type { ValidationError } from "@/schemas/ValidationError/validationError.schema";
