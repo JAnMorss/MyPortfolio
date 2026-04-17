@@ -13,10 +13,8 @@ import ExperienceSkeleton from "@/components/skeletons/ExperienceSkeleton";
 export default function ExperiencePage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("startDate");
-
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState<ExperienceItem | null>(null);
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const {
