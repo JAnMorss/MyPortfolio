@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { educationApiConnector } from "@/api.connector/education/education.api.connector";
-import { GraduationCap, Award, Edit, Trash2 } from "lucide-react";
+import { GraduationCap, Edit, Trash2 } from "lucide-react";
 import EducationModal from "@/components/modals/EducationModal";
 import Pagination from "@/components/common/Pagination";
 import { useServerPagination } from "@/hooks/pagination/usePagination";
