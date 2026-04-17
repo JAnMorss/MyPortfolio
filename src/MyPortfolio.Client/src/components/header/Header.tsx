@@ -14,19 +14,13 @@ export default function Header() {
   return (
     <header className="border-b border-[#d0d7de] dark:border-[#21262d] bg-[#f6f8fa] dark:bg-[#161b22]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        
-        {/* LEFT */}
         <div className="flex items-center gap-3">
           <img src={Logo} alt="Logo" className="w-12 h-12 bg-white rounded-full shadow-md" />
           <span className="text-base font-semibold">JAnMors</span>
         </div>
 
-        {/* RIGHT */}
         <div className="flex items-center gap-3">
-          
           <ThemeToggle />
-
-          {/* 🔥 MODE INDICATOR (NEW) */}
           <div className="hidden sm:flex">
             <div
               className={`text-xs px-3 py-1 rounded-full border backdrop-blur transition
