@@ -23,10 +23,10 @@ public static class AdminSeeder
         var firstName = new FirstName("John Anthony");
         var lastName = new LastName("Morales");
         var age = new Age(26);
-        var email = EmailAddress.Create("janmorsthirteen@gmail.com").Value;
+        var email = EmailAddress.Create("").Value;
         var headLine = HeadLine.Create("Administrator").Value;
         var about = About.Create("This is the default admin user.").Value;
-        var passwordHash = PasswordHash.FromPlainText("P@ssw0rd!");
+        var passwordHash = PasswordHash.FromPlainText("");
         var photoResult = Photo.Create("https://i.pravatar.cc/150?img=1");
         var photo = photoResult.Value;
 
