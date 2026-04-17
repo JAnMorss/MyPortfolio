@@ -1,4 +1,4 @@
-import { UpdateUserProfileSchema, UserAvatarSchema, userProfileSchema, type UpdateUserProfileInput, type UserProfileData, type UserProfileResponse } from "@/schemas/users/userProfile.schema";
+import { UpdateUserProfileSchema, UserAvatarSchema, userProfileSchema, type UpdateUserProfileInput, type UserProfileData } from "@/schemas/users/userProfile.schema";
 import axios, {
   type AxiosInstance,
   type InternalAxiosRequestConfig,
