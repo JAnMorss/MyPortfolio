@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SkillItem } from "@/schemas/skills/skill.schema";
 import { LevelLabel } from "@/schemas/skills/skill.schema";
 import {
@@ -19,6 +19,8 @@ type Props = {
   onSave: (ids: string[]) => void;
 };
 
+const MAX_PINNED_SKILLS = 6;
+
 export default function CustomizeSkillPinsModal({
   open,
   onClose,
@@ -28,11 +30,21 @@ export default function CustomizeSkillPinsModal({
 }: Props) {
   const [selected, setSelected] = useState<string[]>(pinnedIds);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (skills.length === 0) {
+      setSelected(pinnedIds);
+      return;
+    }
+
+    setSelected(pinnedIds.filter((id) => skills.some((skill) => skill.id === id)));
+  }, [pinnedIds, skills]);
+
   const toggle = (id: string) => {
     if (selected.includes(id)) {
       setSelected(selected.filter((i) => i !== id));
     } else {
-      if (selected.length >= 8) return;
+      if (selected.length >= MAX_PINNED_SKILLS) return;
       setSelected([...selected, id]);
     }
   };
@@ -59,7 +71,7 @@ export default function CustomizeSkillPinsModal({
         />
 
         <p className="text-xs text-muted-foreground mt-2">
-          {8 - selected.length} remaining
+          {MAX_PINNED_SKILLS - selected.length} remaining
         </p>
 
         <div className="max-h-75 overflow-y-auto mt-2 space-y-2">
