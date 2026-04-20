@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ProjectItem } from "@/schemas/projects/project.schema";
 
 import {
@@ -20,6 +20,8 @@ type Props = {
   onSave: (ids: string[]) => void;
 };
 
+const MAX_PINNED_PROJECTS = 6;
+
 export default function CustomizePinsModal({
   open,
   onClose,
@@ -30,11 +32,15 @@ export default function CustomizePinsModal({
   const [selected, setSelected] = useState<string[]>(pinnedIds);
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    setSelected(pinnedIds);
+  }, [pinnedIds]);
+
   const toggle = (id: string) => {
     if (selected.includes(id)) {
       setSelected(selected.filter((i) => i !== id));
     } else {
-      if (selected.length >= 7) return;
+      if (selected.length >= MAX_PINNED_PROJECTS) return;
       setSelected([...selected, id]);
     }
   };
@@ -62,7 +68,7 @@ export default function CustomizePinsModal({
         />
 
         <p className="text-xs text-muted-foreground mt-2">
-          {7 - selected.length} remaining
+          {MAX_PINNED_PROJECTS - selected.length} remaining
         </p>
 
         <div className="max-h-75 overflow-y-auto mt-2 space-y-2">
