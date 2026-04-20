@@ -51,6 +51,25 @@ export const skillApiConnector = {
     return skillListSchema.parse(response.data).data;
   },
 
+  getAllSkills: async (): Promise<SkillItem[]> => {
+    const allSkills: SkillItem[] = [];
+    let page = 1;
+    const pageSize = 50;
+
+    while (true) {
+      const data = await skillApiConnector.getSkills(page, pageSize);
+      allSkills.push(...data.items);
+
+      if (allSkills.length >= data.totalCount) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    return allSkills;
+  },
+
   createSkill: async (data: SkillInput): Promise<SkillItem> => {
     const validData = SkillInputSchema.parse(data);
 
