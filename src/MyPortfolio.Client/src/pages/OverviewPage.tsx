@@ -48,8 +48,8 @@ export default function OverviewPage() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const data = await skillApiConnector.getSkills();
-        setSkills(data.items);
+        const data = await skillApiConnector.getAllSkills();
+        setSkills(data);
       } catch (error) {
         console.error("Failed to fetch skills", error);
       } finally {
