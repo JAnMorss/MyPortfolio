@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -28,6 +28,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
   };
+
+  useEffect(() => {
+    const handleForceLogout = () => {
+      setToken(null);
+      setRefreshToken(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+    };
+
+    window.addEventListener("forceLogout", handleForceLogout);
+    return () => window.removeEventListener("forceLogout", handleForceLogout);
+  }, []);
 
   const refreshAuth = (newToken: string, newRefreshToken: string) => {
     setToken(newToken);
