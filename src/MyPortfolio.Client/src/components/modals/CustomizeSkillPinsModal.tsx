@@ -28,17 +28,22 @@ export default function CustomizeSkillPinsModal({
   pinnedIds,
   onSave,
 }: Props) {
-  const [selected, setSelected] = useState<string[]>(pinnedIds);
+  const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    if (skills.length === 0) {
-      setSelected(pinnedIds);
+    if (!open) {
       return;
     }
 
-    setSelected(pinnedIds.filter((id) => skills.some((skill) => skill.id === id)));
-  }, [pinnedIds, skills]);
+    const validPinnedIds = Array.isArray(pinnedIds) ? pinnedIds : [];
+
+    setSelected(
+      skills.length > 0
+        ? validPinnedIds.filter((id) => skills.some((skill) => skill.id === id))
+        : []
+    );
+  }, [open, pinnedIds, skills]);
 
   const toggle = (id: string) => {
     if (selected.includes(id)) {
