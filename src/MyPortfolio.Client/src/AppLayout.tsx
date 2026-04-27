@@ -1,9 +1,22 @@
 import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Header from './components/header/Header';
 import SidebarProfile from './components/sidebarProfile/sidebarProfile';
 import Footer from "./components/Footer/Footer";
+import LoadingPage from "./components/LoadingPage";
 
 export default function AppLayout() {
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setIsAppReady(true), 500);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  if (!isAppReady) {
+    return <LoadingPage />;
+  }
+
   return (
     <div className="min-h-screen bg-white text-black dark:bg-[#212830] dark:text-white">
       <Header />
