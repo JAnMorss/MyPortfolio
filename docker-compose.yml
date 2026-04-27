@@ -1,24 +1,15 @@
-﻿services:
-  portfolio.api:
+services:
+  myportfolio.api:
+    image: ${DOCKER_REGISTRY-}myportfolioapi
+    container_name: portfolio.api
     build:
       context: .
-      dockerfile: Dockerfile
-    image: janmors/portfolio:v1
-    container_name: portfolio.api
-    ports:
-      - "8026:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Database=Server=portfolio.db,1433;Database=MyPortfolio;User Id=sa;Password=Root1234;Trusted_Connection=False;TrustServerCertificate=true
-      - Seq__ServerUrl=http://portfolio-seq:5341
+      dockerfile: src/MyPortfolio.API/Dockerfile
     depends_on:
       - portfolio.db
       - portfolio-seq
       - portfolio-blob-storage
-    restart: on-failure
-    networks:
-      - my_network
-
+  
   portfolio.db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: portfolio.db
@@ -28,16 +19,8 @@
       - MSSQL_PID=Developer
     ports:
       - "2026:1433"
-    networks:
-      - my_network
     volumes:
       - mssql-data:/var/opt/mssql
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Root1234 -Q 'SELECT 1' || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 15s
 
   portfolio-seq:
     image: datalust/seq:latest
@@ -48,8 +31,6 @@
     ports:
       - "5341:5341"
       - "8082:80"
-    networks:
-      - my_network
     volumes:
       - seq-data:/data
 
@@ -61,24 +42,6 @@
     volumes:
       - blob-storage-data:/data
     command: "azurite-blob --blobHost 0.0.0.0 -l /data"
-    networks:
-      - my_network
-
-  portfolio.web:
-    build:
-      context: ./src/MyPortfolio.Client
-      dockerfile: Dockerfile
-    container_name: portfolio.web
-    ports:
-      - "5173:80"
-    depends_on:
-      - portfolio.api
-    networks:
-      - my_network
-
-networks:
-  my_network:
-    driver: bridge
 
 volumes:
   mssql-data:
