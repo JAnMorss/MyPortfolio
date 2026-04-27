@@ -11,4 +11,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/MyPortfolio.Domain.UnitTests/MyPortfolio.Domain.UnitTests.csproj" Id="1afe7567-d0f7-41a5-bbf1-f7681703210a" />
   </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
 </Solution>
