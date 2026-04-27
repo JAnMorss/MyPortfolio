@@ -9,40 +9,9 @@ import {
   type ProjectMediaData
 } from "@/schemas/projects/project.schema";
 
-import axios, {
-  type AxiosInstance,
-  type InternalAxiosRequestConfig,
-  AxiosHeaders,
-  type AxiosResponse,
-} from "axios";
+import { createApiClient } from "@/api.connector/axios.client";
 
-const BASE_URL = "http://localhost:8026/api/v1";
-
-const api: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      if (!config.headers) {
-        config.headers = new AxiosHeaders();
-      }
-      config.headers.set("Authorization", `Bearer ${token}`);
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-api.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  (error) => Promise.reject(error)
-);
+const api = createApiClient();
 
 export const projectApiConnector = {
   getProjects: async (page: number = 1, pageSize: number = 10, search?: string, sortBy?: string): Promise<ProjectListData> => {
