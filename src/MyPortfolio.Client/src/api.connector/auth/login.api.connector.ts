@@ -1,6 +1,7 @@
 import { loginInputSchema, loginResponseSchema, type LoginApiResponse } from "@/schemas/login/login.schema";
 import { validationResponseSchema } from "@/schemas/ValidationError/validationError.schema";
 import axios, { AxiosHeaders, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import { refreshAccessToken } from "@/api.connector/axios.client";
 
 const BASE_URL = "http://localhost:8026/api/v1/auth";
 
@@ -50,18 +51,7 @@ export const loginApiConnector = {
   },
 
   refreshToken: async (): Promise<{ token: string; refreshToken: string }> => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) throw new Error("No refresh token available");
-
-    const response = await api.post("/refresh-token", { refreshToken });
-    const data = response.data;
-
-    if (!data.token || !data.refreshToken) throw new Error("Invalid refresh token response");
-
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("refreshToken", data.refreshToken);
-
-    return { token: data.token, refreshToken: data.refreshToken };
+    return await refreshAccessToken();
   },
 
   logout(): void {
