@@ -29,12 +29,22 @@ export default function CustomizePinsModal({
   pinnedIds,
   onSave,
 }: Props) {
-  const [selected, setSelected] = useState<string[]>(pinnedIds);
+  const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    setSelected(pinnedIds);
-  }, [pinnedIds]);
+    if (!open) {
+      return;
+    }
+
+    const validPinnedIds = Array.isArray(pinnedIds) ? pinnedIds : [];
+
+    setSelected(
+      projects.length > 0
+        ? validPinnedIds.filter((id) => projects.some((project) => project.id === id))
+        : []
+    );
+  }, [open, pinnedIds, projects]);
 
   const toggle = (id: string) => {
     if (selected.includes(id)) {
