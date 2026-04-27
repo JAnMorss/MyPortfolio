@@ -20,7 +20,7 @@ import ProfileAvatar from "./ProfileAvatar";
 import ProfileViews from "./ProfileViews";
 import { connection } from "@/lib/signalr";
 
-const USER_ID = "4AB06C35-908E-4697-8A35-5E7546C292D2";
+const USER_ID = "23591C3B-1E71-4627-A1AD-A3F414CE830B";
 
 const splitName = (fullName: string) => {
   const parts = fullName.trim().split(" ");
